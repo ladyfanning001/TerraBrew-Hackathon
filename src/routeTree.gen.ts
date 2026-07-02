@@ -9,12 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as DashboardValidateRouteImport } from './routes/dashboard.validate'
 import { Route as DashboardLearnRouteImport } from './routes/dashboard.learn'
 import { Route as DashboardHistoryRouteImport } from './routes/dashboard.history'
+import { Route as DashboardCertificationRouteImport } from './routes/dashboard.certification'
 
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -30,6 +44,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardValidateRoute = DashboardValidateRouteImport.update({
+  id: '/validate',
+  path: '/validate',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardLearnRoute = DashboardLearnRouteImport.update({
   id: '/learn',
   path: '/learn',
@@ -40,26 +59,43 @@ const DashboardHistoryRoute = DashboardHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardCertificationRoute = DashboardCertificationRouteImport.update({
+  id: '/certification',
+  path: '/certification',
+  getParentRoute: () => DashboardRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/dashboard/certification': typeof DashboardCertificationRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/learn': typeof DashboardLearnRoute
+  '/dashboard/validate': typeof DashboardValidateRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/dashboard/certification': typeof DashboardCertificationRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/learn': typeof DashboardLearnRoute
+  '/dashboard/validate': typeof DashboardValidateRoute
   '/dashboard': typeof DashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/dashboard/certification': typeof DashboardCertificationRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/learn': typeof DashboardLearnRoute
+  '/dashboard/validate': typeof DashboardValidateRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRouteTypes {
@@ -67,27 +103,59 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/login'
+    | '/register'
+    | '/dashboard/certification'
     | '/dashboard/history'
     | '/dashboard/learn'
+    | '/dashboard/validate'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard/history' | '/dashboard/learn' | '/dashboard'
+  to:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/dashboard/certification'
+    | '/dashboard/history'
+    | '/dashboard/learn'
+    | '/dashboard/validate'
+    | '/dashboard'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
+    | '/login'
+    | '/register'
+    | '/dashboard/certification'
     | '/dashboard/history'
     | '/dashboard/learn'
+    | '/dashboard/validate'
     | '/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -109,6 +177,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/validate': {
+      id: '/dashboard/validate'
+      path: '/validate'
+      fullPath: '/dashboard/validate'
+      preLoaderRoute: typeof DashboardValidateRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/learn': {
       id: '/dashboard/learn'
       path: '/learn'
@@ -123,18 +198,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardHistoryRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/certification': {
+      id: '/dashboard/certification'
+      path: '/certification'
+      fullPath: '/dashboard/certification'
+      preLoaderRoute: typeof DashboardCertificationRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 
 interface DashboardRouteChildren {
+  DashboardCertificationRoute: typeof DashboardCertificationRoute
   DashboardHistoryRoute: typeof DashboardHistoryRoute
   DashboardLearnRoute: typeof DashboardLearnRoute
+  DashboardValidateRoute: typeof DashboardValidateRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardCertificationRoute: DashboardCertificationRoute,
   DashboardHistoryRoute: DashboardHistoryRoute,
   DashboardLearnRoute: DashboardLearnRoute,
+  DashboardValidateRoute: DashboardValidateRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
@@ -145,6 +231,8 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

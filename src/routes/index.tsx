@@ -60,7 +60,7 @@ function Landing() {
               <Link to="/dashboard">Sign in</Link>
             </Button>
             <Button asChild className="bg-coffee text-primary-foreground hover:bg-coffee-deep rounded-full px-5">
-              <Link to="/dashboard">Open Predictor</Link>
+              <Link to="/dashboard">Find Coffee Process</Link>
             </Button>
           </div>
         </div>
@@ -76,7 +76,7 @@ function Landing() {
           <div>
             <Badge variant="secondary" className="mb-5 gap-1.5 rounded-full border border-forest/20 bg-forest/10 text-forest">
               <Sparkles className="h-3 w-3 animate-spin" style={{ animationDuration: '3s' }} />
-              AI for sustainable post-harvest processing
+              AI for sustainable coffee post-harvesting
             </Badge>
             <h1 className="text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl text-primary">
               Empowering Coffee Farmers, <span className="text-accent">Sustainably.</span>
@@ -93,7 +93,7 @@ function Landing() {
                 className="rounded-full bg-forest text-cream shadow-md hover:bg-forest-deep px-7"
               >
                 <Link to="/dashboard">
-                  Try Smart Predictor <ArrowRight className="ml-2 h-4 w-4" />
+                  Find Best Process <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button
@@ -323,6 +323,62 @@ function Landing() {
         </div>
       </section>
 
+      {/* Certification (Pro) Section */}
+      <section className="mx-auto max-w-7xl px-6 py-12 border-t border-border">
+        <div className="bg-gradient-to-br from-cream/20 via-background to-forest/5 rounded-3xl border border-forest/10 p-8 md:p-12 shadow-[var(--shadow-soft)]">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+            <div>
+              <Badge className="bg-honey text-cream rounded-full px-3 py-1 font-bold text-xs uppercase tracking-wider mb-2">
+                PRO FEATURE
+              </Badge>
+              <h2 className="text-3xl font-bold tracking-tight text-primary">
+                Specialty Coffee & Sustainability Certification
+              </h2>
+              <p className="text-muted-foreground mt-2 max-w-2xl text-sm leading-relaxed">
+                Elevate your coffee's value in global markets by conducting self-assessments and validating Specialty Coffee standards with SEA (Eco-Agribusiness Certification) auditors.
+              </p>
+            </div>
+            <Button asChild size="lg" className="rounded-full bg-forest text-cream hover:bg-forest-deep px-6 font-bold shadow-md">
+              <Link to="/dashboard/certification">Apply for Certification</Link>
+            </Button>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-4">
+            <div className="p-6 rounded-2xl bg-card border border-border/80">
+              <div className="h-9 w-9 rounded-xl bg-forest/10 flex items-center justify-center text-forest font-bold mb-3">1</div>
+              <h3 className="font-bold text-foreground">Environmental Score</h3>
+              <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                Assess climate suitability, processing water efficiency, clean energy usage, organic pesticide control, and soil conservation methods.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-card border border-border/80">
+              <div className="h-9 w-9 rounded-xl bg-chart-4/10 flex items-center justify-center text-chart-4 font-bold mb-3">2</div>
+              <h3 className="font-bold text-foreground">Economic Score</h3>
+              <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                Measure coffee bean physical/cupping quality, stabilized income, sustainably-managed farm land, productivity yield, and credit access.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-card border border-border/80">
+              <div className="h-9 w-9 rounded-xl bg-honey/10 flex items-center justify-center text-honey font-bold mb-3">3</div>
+              <h3 className="font-bold text-foreground">Social Score</h3>
+              <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                Evaluate cooperative/group participation, gender equity indexes, worker safety training/education, smartphone utility, and market price access.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-gradient-to-tr from-coffee to-coffee-deep text-cream border-transparent">
+              <div className="h-9 w-9 rounded-xl bg-cream/15 flex items-center justify-center text-cream font-bold mb-3">✓</div>
+              <h3 className="font-bold text-cream">SEA Verification</h3>
+              <p className="text-xs text-cream/70 mt-2 leading-relaxed">
+                Submitted certification applications are reviewed directly by official SEA validators to issue authorized stamps and certificates.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="px-6 pb-24">
         <div
@@ -342,7 +398,7 @@ function Landing() {
             </div>
             <div className="flex flex-wrap gap-3 md:justify-end">
               <Button asChild size="lg" className="rounded-full bg-cream text-coffee-deep hover:bg-cream/90 px-6 font-semibold shadow-sm">
-                <Link to="/dashboard">Launch Smart Predictor</Link>
+                <Link to="/dashboard">Find Best Coffee Process</Link>
               </Button>
               <Button
                 asChild

@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   BookOpen,
@@ -6,6 +6,9 @@ import {
   Coffee,
   Leaf,
   Settings,
+  Award,
+  ShieldCheck,
+  LogOut,
 } from "lucide-react";
 import {
   Sidebar,
@@ -19,17 +22,32 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
-const items = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Learning Center", url: "/dashboard/learn", icon: BookOpen },
-  { title: "Processing History", url: "/dashboard/history", icon: History },
-];
+import { useAuth } from "@/hooks/useAuth";
 
 export function AppSidebar() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
+  
   const isActive = (url: string) =>
     url === "/dashboard" ? path === url : path.startsWith(url);
+
+  // Dynamic menu items based on user role
+  const items = user?.role === "sea"
+    ? [
+        { title: "Validation Portal", url: "/dashboard/validate", icon: ShieldCheck },
+      ]
+    : [
+        { title: "Best Coffee Process", url: "/dashboard", icon: LayoutDashboard },
+        { title: "Certification (Pro)", url: "/dashboard/certification", icon: Award },
+        { title: "Learning Center", url: "/dashboard/learn", icon: BookOpen },
+        { title: "Processing History", url: "/dashboard/history", icon: History },
+      ];
+
+  const handleLogout = () => {
+    logout();
+    navigate({ to: "/login" });
+  };
 
   return (
     <Sidebar collapsible="icon">
@@ -84,7 +102,9 @@ export function AppSidebar() {
                 Sustainability Tip
               </div>
               <p className="mt-2 text-xs leading-relaxed text-sidebar-foreground/70">
-                Honey processing can cut water use by up to 80% versus washed.
+                {user?.role === "sea" 
+                  ? "Audit carefully. Ecoscore ratings are categorized as Low (< 0.33), Medium (0.33-0.66), and High (>= 0.66)."
+                  : "Honey processing can cut water use by up to 80% versus washed."}
               </p>
             </div>
           </SidebarGroupContent>
@@ -94,9 +114,9 @@ export function AppSidebar() {
       <SidebarFooter className="border-t border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Settings">
-              <Settings className="h-4 w-4" />
-              <span>Settings</span>
+            <SidebarMenuButton onClick={handleLogout} tooltip="Sign Out" className="text-destructive hover:text-destructive/90 hover:bg-destructive/10">
+              <LogOut className="h-4 w-4" />
+              <span>Sign Out</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
