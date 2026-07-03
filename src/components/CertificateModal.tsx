@@ -171,7 +171,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
               </span>
             </div>
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold tracking-wide mt-3 text-coffee uppercase">
-              Certificate of Sustainability
+              Verified Certificate of Sustainability
             </h1>
             <p className="text-[10px] md:text-xs italic text-muted-foreground uppercase tracking-widest">
               Speciality Coffee Post-Harvest Excellence
