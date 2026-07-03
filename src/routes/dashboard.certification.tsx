@@ -1129,7 +1129,7 @@ function CertificationPage() {
                               <th className="py-3 px-6 text-center">Score</th>
                               <th className="py-3 px-6">Validator</th>
                               <th className="py-3 px-6">Proof</th>
-                              <th className="py-3 px-6 text-right">Certificate</th>
+                              <th className="py-3 px-6 text-right">Verification</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1159,7 +1159,7 @@ function CertificationPage() {
                                     size="sm"
                                     className="rounded-xl bg-forest hover:bg-forest-deep text-cream font-bold transition shadow-sm text-xs py-1 px-3"
                                   >
-                                    View Certificate
+                                    View Verification
                                   </Button>
                                 </td>
                               </tr>

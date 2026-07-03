@@ -142,7 +142,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-4xl w-[95vw] p-2 bg-[#FAF8F2] border border-[#dacfbe] rounded-2xl shadow-elegant overflow-y-auto max-h-[95vh] no-print">
         <DialogTitle className="sr-only">
-          Speciality Coffee Sustainability Certificate - {certification.farm_name}
+          Speciality Coffee Sustainability Verification - {certification.farm_name}
         </DialogTitle>
         <DialogDescription className="sr-only">
           Official certification for {certification.farm_name} indicating eco-score of {ecoscore.toFixed(2)}
@@ -171,7 +171,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
               </span>
             </div>
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif font-bold tracking-wide mt-3 text-coffee uppercase">
-              Verified Certificate of Sustainability
+              Sustainability Verified by SEA
             </h1>
             <p className="text-[10px] md:text-xs italic text-muted-foreground uppercase tracking-widest">
               Speciality Coffee Post-Harvest Excellence
@@ -183,7 +183,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
           {/* Certificate Recipient */}
           <div className="text-center space-y-4 animate-fade-in-up animation-delay-100">
             <p className="text-xs font-sans tracking-widest text-muted-foreground uppercase">
-              This is officially awarded to
+              This profile is officially verified for
             </p>
             <h2 className="text-2xl md:text-4xl lg:text-5xl font-serif font-extrabold text-coffee capitalize tracking-wide py-1">
               {certification.farm_name}
@@ -269,7 +269,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
             onClick={handlePrint}
             className="rounded-xl bg-forest hover:bg-forest-deep text-cream font-bold shadow-md transition flex items-center gap-1.5"
           >
-            <Printer className="h-4 w-4" /> Print Certificate
+            <Printer className="h-4 w-4" /> Print Verification
           </Button>
         </div>
       </DialogContent>

@@ -336,7 +336,7 @@ function ValidatePortal() {
                                 size="sm"
                                 className="bg-forest text-cream hover:bg-forest-deep rounded-lg font-bold text-xs flex items-center gap-1"
                               >
-                                <Award className="h-3.5 w-3.5" /> Certificate
+                                <Award className="h-3.5 w-3.5" /> Verification
                               </Button>
                             )}
                             <Dialog>
