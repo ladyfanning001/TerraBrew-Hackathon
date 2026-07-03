@@ -308,6 +308,7 @@ function DashboardHome() {
   const [hasCalculated, setHasCalculated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
@@ -1105,7 +1106,8 @@ function DashboardHome() {
             <Button
               size="lg"
               onClick={async () => {
-                setHasCalculated(true);
+                setHasCalculated(false);
+                setIsGenerating(true);
 
                 // Write prediction to PostgreSQL Database via Server Function
                 try {
@@ -1125,20 +1127,52 @@ function DashboardHome() {
                   console.error("Failed to log to PostgreSQL:", dbErr);
                 }
 
-                // Scroll page smoothly to results
+                // Simulate processing latency for visual feedback
                 setTimeout(() => {
-                  document
-                    .getElementById("recommendation-results")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }, 100);
+                  setIsGenerating(false);
+                  setHasCalculated(true);
+
+                  // Scroll page smoothly to results
+                  setTimeout(() => {
+                    document
+                      .getElementById("recommendation-results")
+                      ?.scrollIntoView({ behavior: "smooth" });
+                  }, 100);
+                }, 1800);
               }}
-              className="bg-coffee text-cream hover:bg-coffee-deep rounded-full font-bold px-8 shadow-md flex items-center gap-2"
+              disabled={isGenerating}
+              className="bg-coffee text-cream hover:bg-coffee-deep rounded-full font-bold px-8 shadow-md flex items-center gap-2 disabled:opacity-80"
             >
-              <Navigation className="h-4 w-4" /> Generate Preprocessing Recommendation
+              {isGenerating ? (
+                <>
+                  <div className="h-4 w-4 border-2 border-cream/20 border-t-cream rounded-full animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <Navigation className="h-4 w-4" /> Generate Preprocessing Recommendation
+                </>
+              )}
             </Button>
           </div>
         </CardContent>
       </Card>
+
+      {/* LOADING STATE DISPLAY */}
+      {isGenerating && (
+        <div className="flex flex-col items-center justify-center p-12 bg-card border border-border/60 rounded-2xl shadow-soft space-y-4 animate-pulse">
+          <div className="relative flex items-center justify-center">
+            <div className="h-16 w-16 rounded-full border-4 border-forest/10 border-t-forest animate-spin" />
+            <Leaf className="absolute h-6 w-6 text-forest animate-pulse" />
+          </div>
+          <div className="text-center space-y-2">
+            <h3 className="text-base font-bold text-foreground">Processing Preprocessing Recommendation...</h3>
+            <p className="text-xs text-muted-foreground max-w-sm mx-auto animate-bounce duration-1000">
+              Modeling environmental variables, water footprint limits, and coffee cherry grade...
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* RESULTS DISPLAY PANEL */}
       {hasCalculated && (

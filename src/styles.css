@@ -268,3 +268,31 @@
   margin: 1cm;
 }
 
+/* Animated Water Waves for Landing Page */
+@keyframes wave-move-1 {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes wave-move-2 {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-wave-1 {
+  animation: wave-move-1 25s linear infinite;
+}
+
+.animate-wave-2 {
+  animation: wave-move-2 35s linear infinite;
+}
+
+

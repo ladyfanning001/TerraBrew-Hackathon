@@ -242,8 +242,36 @@ function Landing() {
       </section>
 
       {/* About TerraBrew */}
-      <section id="about" className="py-24 border-t border-border bg-card">
-        <div className="mx-auto max-w-5xl px-6">
+      <section id="about" className="relative py-24 border-t border-border bg-card overflow-hidden">
+        {/* Animated Water Background Waves */}
+        <div className="absolute inset-0 opacity-25 dark:opacity-10 pointer-events-none overflow-hidden select-none">
+          <div className="absolute bottom-0 left-0 w-[200%] h-48">
+            <svg className="absolute bottom-0 w-full h-full animate-wave-1" viewBox="0 0 1200 120" preserveAspectRatio="none" style={{ fill: "#2B6CB0" }}>
+              <path d="M0,60 C150,100 350,20 500,60 C650,100 850,20 1000,60 C1150,100 1350,20 1500,60 C1650,100 1850,20 2000,60 L2000,120 L0,120 Z" />
+            </svg>
+          </div>
+          <div className="absolute bottom-0 left-0 w-[200%] h-40 opacity-75">
+            <svg className="absolute bottom-0 w-full h-full animate-wave-2" viewBox="0 0 1200 120" preserveAspectRatio="none" style={{ fill: "#4299E1" }}>
+              <path d="M0,50 C100,20 250,80 400,50 C550,20 700,80 850,50 C1000,20 1150,80 1300,50 C1450,20 1600,80 1750,50 L1750,120 L0,120 Z" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Sun & Sunshine Rays Overlay */}
+        <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
+          {/* Main sun glow in corner */}
+          <div className="absolute -top-32 -right-32 w-96 h-96 bg-gradient-to-br from-amber-200/40 via-yellow-100/10 to-transparent rounded-full blur-3xl animate-pulse duration-[6000ms]" />
+          
+          {/* Diagonal sunbeams */}
+          <div className="absolute top-0 right-0 w-[150%] h-[150%] opacity-15 dark:opacity-[0.06] rotate-[-35deg] translate-x-[20%] -translate-y-[20%] flex justify-around">
+            <div className="w-16 h-full bg-gradient-to-b from-amber-200 via-yellow-100/10 to-transparent blur-md transform -skew-x-12 animate-pulse duration-[4000ms]" />
+            <div className="w-24 h-full bg-gradient-to-b from-amber-200 via-yellow-100/15 to-transparent blur-lg transform -skew-x-12 animate-pulse duration-[7000ms] delay-500" />
+            <div className="w-12 h-full bg-gradient-to-b from-amber-200 via-yellow-100/10 to-transparent blur-sm transform -skew-x-12 animate-pulse duration-[5000ms] delay-1000" />
+            <div className="w-32 h-full bg-gradient-to-b from-amber-200 via-yellow-100/20 to-transparent blur-xl transform -skew-x-12 animate-pulse duration-[8000ms] delay-200" />
+          </div>
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-5xl px-6">
           <div className="text-center max-w-3xl mx-auto">
             <Badge
               variant="outline"
