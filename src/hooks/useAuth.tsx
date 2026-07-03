@@ -68,7 +68,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         // FALLBACK: If database is not connected, support mock accounts for smooth testing
         const errMsg = res.error || "Login failed";
-        if (errMsg.includes("Database connection not available") || errMsg.includes("Failed to connect")) {
+        if (
+          errMsg.includes("Database connection not available") ||
+          errMsg.includes("Failed to connect")
+        ) {
           // Check for mock credentials
           const cleanEmail = email.toLowerCase().trim();
           if (
@@ -147,7 +150,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         // Fallback for registry mock mode
         const errMsg = res.error || "Registration failed";
-        if (errMsg.includes("Database connection not available") || errMsg.includes("Failed to connect")) {
+        if (
+          errMsg.includes("Database connection not available") ||
+          errMsg.includes("Failed to connect")
+        ) {
           const mockUser: UserProfile = {
             id: Math.floor(Math.random() * 1000) + 1,
             email: data.email.toLowerCase().trim(),

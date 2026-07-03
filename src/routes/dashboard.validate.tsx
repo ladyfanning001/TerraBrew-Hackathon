@@ -4,19 +4,37 @@ import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { getPendingCertifications } from "@/lib/auth-server";
 import { toast } from "sonner";
-import { 
-  ShieldCheck, Award, ClipboardCheck, AlertCircle, CheckCircle2, XCircle, Clock, Eye, Image
+import {
+  ShieldCheck,
+  Award,
+  ClipboardCheck,
+  AlertCircle,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Eye,
+  Image,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/dashboard/validate")({
   head: () => ({
     meta: [
       { title: "Validation Portal — TerraBrew" },
-      { name: "description", content: "SEA Validator interface for Specialty Coffee Certifications." },
+      {
+        name: "description",
+        content: "SEA Validator interface for Specialty Coffee Certifications.",
+      },
     ],
   }),
   component: ValidatePortal,
@@ -32,21 +50,30 @@ function ValidatePortal() {
   // Fetch pending certifications
   const { data: pendingList, isLoading: isPendingLoading } = useQuery({
     queryKey: ["certificationsList", user?.id, viewMode, "pending"],
-    queryFn: () => getPendingCertifications({ data: { validatorId: user!.id, allRegions: viewMode === "all", status: "pending" } }),
+    queryFn: () =>
+      getPendingCertifications({
+        data: { validatorId: user!.id, allRegions: viewMode === "all", status: "pending" },
+      }),
     enabled: !!user && user.role === "sea",
   });
 
   // Fetch approved certifications
   const { data: approvedList, isLoading: isApprovedLoading } = useQuery({
     queryKey: ["certificationsList", user?.id, viewMode, "approved"],
-    queryFn: () => getPendingCertifications({ data: { validatorId: user!.id, allRegions: viewMode === "all", status: "approved" } }),
+    queryFn: () =>
+      getPendingCertifications({
+        data: { validatorId: user!.id, allRegions: viewMode === "all", status: "approved" },
+      }),
     enabled: !!user && user.role === "sea",
   });
 
   // Fetch rejected certifications
   const { data: rejectedList, isLoading: isRejectedLoading } = useQuery({
     queryKey: ["certificationsList", user?.id, viewMode, "rejected"],
-    queryFn: () => getPendingCertifications({ data: { validatorId: user!.id, allRegions: viewMode === "all", status: "rejected" } }),
+    queryFn: () =>
+      getPendingCertifications({
+        data: { validatorId: user!.id, allRegions: viewMode === "all", status: "rejected" },
+      }),
     enabled: !!user && user.role === "sea",
   });
 
@@ -62,15 +89,19 @@ function ValidatePortal() {
     );
   }
 
-  const currentList = 
-    statusFilter === "pending" ? pendingList : 
-    statusFilter === "approved" ? approvedList : 
-    rejectedList;
+  const currentList =
+    statusFilter === "pending"
+      ? pendingList
+      : statusFilter === "approved"
+        ? approvedList
+        : rejectedList;
 
-  const isLoading = 
-    statusFilter === "pending" ? isPendingLoading : 
-    statusFilter === "approved" ? isApprovedLoading : 
-    isRejectedLoading;
+  const isLoading =
+    statusFilter === "pending"
+      ? isPendingLoading
+      : statusFilter === "approved"
+        ? isApprovedLoading
+        : isRejectedLoading;
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
@@ -82,11 +113,15 @@ function ValidatePortal() {
           </div>
           <h1 className="mt-1 text-2xl font-bold md:text-3xl text-primary">Validation Portal</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Review farmers' self-reported sustainability metrics, check indicator scores across the 3 pillars, provide feedback, and issue official certificates.
+            Review farmers' self-reported sustainability metrics, check indicator scores across the
+            3 pillars, provide feedback, and issue official certificates.
           </p>
         </div>
         {user?.country && user?.region && (
-          <Badge variant="outline" className="border-honey/30 text-honey bg-honey/5 rounded-xl px-4 py-2 text-xs font-bold gap-1.5 shadow-sm">
+          <Badge
+            variant="outline"
+            className="border-honey/30 text-honey bg-honey/5 rounded-xl px-4 py-2 text-xs font-bold gap-1.5 shadow-sm"
+          >
             📍 {user.region}, {user.country} Jurisdiction
           </Badge>
         )}
@@ -176,14 +211,19 @@ function ValidatePortal() {
             {statusFilter === "rejected" && "Rejected Applications"}
           </CardTitle>
           <CardDescription>
-            {statusFilter === "pending" && `There are ${pendingList?.length || 0} applications awaiting audit review.`}
-            {statusFilter === "approved" && `You have approved ${approvedList?.length || 0} specialty coffee certifications.`}
-            {statusFilter === "rejected" && `There are ${rejectedList?.length || 0} rejected applications.`}
+            {statusFilter === "pending" &&
+              `There are ${pendingList?.length || 0} applications awaiting audit review.`}
+            {statusFilter === "approved" &&
+              `You have approved ${approvedList?.length || 0} specialty coffee certifications.`}
+            {statusFilter === "rejected" &&
+              `There are ${rejectedList?.length || 0} rejected applications.`}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="py-8 text-center text-muted-foreground">Loading certification requests...</div>
+            <div className="py-8 text-center text-muted-foreground">
+              Loading certification requests...
+            </div>
           ) : currentList && currentList.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -194,13 +234,18 @@ function ValidatePortal() {
                     <th className="py-3 px-6 text-center">Ecoscore</th>
                     <th className="py-3 px-6">Submission Date</th>
                     {statusFilter !== "pending" && <th className="py-3 px-6">Feedback / Reason</th>}
-                    {statusFilter === "approved" && <th className="py-3 px-6 text-center">Audit Photo</th>}
+                    {statusFilter === "approved" && (
+                      <th className="py-3 px-6 text-center">Audit Photo</th>
+                    )}
                     <th className="py-3 px-6 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentList.map((c: any) => (
-                    <tr key={c.id} className="border-t border-border/60 hover:bg-secondary/10 transition-colors">
+                    <tr
+                      key={c.id}
+                      className="border-t border-border/60 hover:bg-secondary/10 transition-colors"
+                    >
                       <td className="py-4 px-6">
                         <div className="font-bold text-foreground">{c.farmer_name}</div>
                         <div className="text-muted-foreground text-[10px]">{c.farmer_email}</div>
@@ -210,18 +255,24 @@ function ValidatePortal() {
                         <div className="text-muted-foreground text-xs">{c.coffee_variety}</div>
                       </td>
                       <td className="py-4 px-6 text-center">
-                        <Badge 
+                        <Badge
                           className={`font-extrabold rounded-full px-2.5 py-0.5 text-xs ${
-                            statusFilter === "pending" ? "bg-amber-500/10 text-amber-700 hover:bg-amber-500/20" :
-                            statusFilter === "approved" ? "bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20" :
-                            "bg-rose-500/10 text-rose-700 hover:bg-rose-500/20"
+                            statusFilter === "pending"
+                              ? "bg-amber-500/10 text-amber-700 hover:bg-amber-500/20"
+                              : statusFilter === "approved"
+                                ? "bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20"
+                                : "bg-rose-500/10 text-rose-700 hover:bg-rose-500/20"
                           }`}
                         >
                           {Number(c.ecoscore).toFixed(2)}
                         </Badge>
                       </td>
                       <td className="py-4 px-6 text-muted-foreground text-xs">
-                        {new Date(c.created_at).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })}
+                        {new Date(c.created_at).toLocaleDateString("en-US", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </td>
                       {statusFilter !== "pending" && (
                         <td className="py-4 px-6 max-w-xs text-xs text-muted-foreground">
@@ -235,17 +286,29 @@ function ValidatePortal() {
                           {c.validator_photo ? (
                             <Dialog>
                               <DialogTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-forest hover:bg-forest/10 rounded-lg">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-forest hover:bg-forest/10 rounded-lg"
+                                >
                                   <Image className="h-4 w-4" />
                                 </Button>
                               </DialogTrigger>
                               <DialogContent className="max-w-md rounded-2xl">
                                 <DialogHeader>
-                                  <DialogTitle className="text-sm font-bold">On-Site Audit Proof</DialogTitle>
-                                  <DialogDescription>Submitted proof for {c.farm_name}</DialogDescription>
+                                  <DialogTitle className="text-sm font-bold">
+                                    On-Site Audit Proof
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    Submitted proof for {c.farm_name}
+                                  </DialogDescription>
                                 </DialogHeader>
                                 <div className="mt-2 rounded-xl overflow-hidden border border-border aspect-video">
-                                  <img src={c.validator_photo} alt="Audit Proof" className="w-full h-full object-cover" />
+                                  <img
+                                    src={c.validator_photo}
+                                    alt="Audit Proof"
+                                    className="w-full h-full object-cover"
+                                  />
                                 </div>
                               </DialogContent>
                             </Dialog>
@@ -287,23 +350,33 @@ function ValidatePortal() {
                               <div className="space-y-4 text-xs mt-2">
                                 <div className="grid grid-cols-2 gap-4 p-3 bg-secondary/15 rounded-xl border border-border/40">
                                   <div>
-                                    <span className="text-muted-foreground block text-[10px] uppercase font-bold">Status</span>
-                                    <Badge 
+                                    <span className="text-muted-foreground block text-[10px] uppercase font-bold">
+                                      Status
+                                    </span>
+                                    <Badge
                                       className={`font-extrabold rounded-full px-2.5 py-0.5 mt-1 text-xs ${
-                                        statusFilter === "approved" ? "bg-emerald-500/10 text-emerald-700" : "bg-rose-500/10 text-rose-700"
+                                        statusFilter === "approved"
+                                          ? "bg-emerald-500/10 text-emerald-700"
+                                          : "bg-rose-500/10 text-rose-700"
                                       }`}
                                     >
                                       {c.status.toUpperCase()}
                                     </Badge>
                                   </div>
                                   <div>
-                                    <span className="text-muted-foreground block text-[10px] uppercase font-bold">Ecoscore</span>
-                                    <span className="text-base font-extrabold text-forest mt-1 block">{Number(c.ecoscore).toFixed(2)}</span>
+                                    <span className="text-muted-foreground block text-[10px] uppercase font-bold">
+                                      Ecoscore
+                                    </span>
+                                    <span className="text-base font-extrabold text-forest mt-1 block">
+                                      {Number(c.ecoscore).toFixed(2)}
+                                    </span>
                                   </div>
                                 </div>
 
                                 <div className="space-y-1">
-                                  <span className="text-muted-foreground block text-[10px] uppercase font-bold">Feedback / Audit Comments</span>
+                                  <span className="text-muted-foreground block text-[10px] uppercase font-bold">
+                                    Feedback / Audit Comments
+                                  </span>
                                   <div className="bg-secondary/10 border border-border/40 p-3 rounded-xl italic text-foreground whitespace-pre-line">
                                     "{c.validator_feedback || "No feedback details provided."}"
                                   </div>
@@ -311,9 +384,15 @@ function ValidatePortal() {
 
                                 {c.validator_photo && (
                                   <div className="space-y-1">
-                                    <span className="text-muted-foreground block text-[10px] uppercase font-bold">Audit Proof Photo</span>
+                                    <span className="text-muted-foreground block text-[10px] uppercase font-bold">
+                                      Audit Proof Photo
+                                    </span>
                                     <div className="rounded-xl overflow-hidden border border-border aspect-video max-w-sm mt-1 mx-auto">
-                                      <img src={c.validator_photo} alt="Audit Proof" className="w-full h-full object-cover" />
+                                      <img
+                                        src={c.validator_photo}
+                                        alt="Audit Proof"
+                                        className="w-full h-full object-cover"
+                                      />
                                     </div>
                                   </div>
                                 )}
@@ -329,7 +408,8 @@ function ValidatePortal() {
             </div>
           ) : (
             <div className="p-12 text-center text-muted-foreground font-semibold">
-              {statusFilter === "pending" && "No certification requests are pending validation at this time."}
+              {statusFilter === "pending" &&
+                "No certification requests are pending validation at this time."}
               {statusFilter === "approved" && "No approved certificates found."}
               {statusFilter === "rejected" && "No rejected applications found."}
             </div>

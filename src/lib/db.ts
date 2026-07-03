@@ -8,7 +8,7 @@ export interface Profile {
   email: string;
   password_hash: string;
   full_name: string;
-  role: 'farmer' | 'sea';
+  role: "farmer" | "sea";
   farm_name?: string;
   organization?: string;
   country?: string;
@@ -33,7 +33,7 @@ export interface Certification {
   farmer_id: number;
   farm_name: string;
   coffee_variety: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
   country?: string;
   region?: string;
   env_suhu?: number;
@@ -71,7 +71,7 @@ let sql: any = null;
 let isInitialized = false;
 
 export async function getDb() {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     return null; // Don't run Postgres in client browser
   }
 
@@ -84,9 +84,9 @@ export async function getDb() {
     // Connect to postgres db
     sql = postgres.default(connectionString, {
       connect_timeout: 5,
-      max_lifetime_sec: 60,
+      max_lifetime: 60,
     });
-    
+
     // Test connection
     await sql`SELECT 1`;
     console.log("Connected to PostgreSQL successfully");
@@ -96,7 +96,7 @@ export async function getDb() {
       await initializeSchema();
       isInitialized = true;
     }
-    
+
     return sql;
   } catch (error) {
     console.error("Failed to connect to PostgreSQL. Operating in Mock mode.", error);

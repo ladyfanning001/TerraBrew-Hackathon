@@ -1,8 +1,26 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageSquare, Send, X, Bot, Sparkles, Coffee, Volume2, VolumeX, Mic, MicOff } from "lucide-react";
+import {
+  MessageSquare,
+  Send,
+  X,
+  Bot,
+  Sparkles,
+  Coffee,
+  Volume2,
+  VolumeX,
+  Mic,
+  MicOff,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { askTerryChatbot } from "@/lib/auth-server";
 import { toast } from "sonner";
 
@@ -17,8 +35,9 @@ export function TerryChatbot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "model",
-      content: "Hello! I am **TerraAI**, your TerraBrew AI Assistant. ☕💚\n\nI can help you determine the best processing methods for your coffee, explain the Ecoscore pillars, or guide you through the SEA certification process. What would you like to know today?"
-    }
+      content:
+        "Hello! I am **TerraAI**, your TerraBrew AI Assistant. ☕💚\n\nI can help you determine the best processing methods for your coffee, explain the Ecoscore pillars, or guide you through the SEA certification process. What would you like to know today?",
+    },
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentlySpeaking, setCurrentlySpeaking] = useState<number | null>(null);
@@ -120,7 +139,7 @@ export function TerryChatbot() {
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = "en-US";
-    
+
     utterance.onend = () => {
       setCurrentlySpeaking(null);
     };
@@ -146,8 +165,8 @@ export function TerryChatbot() {
     try {
       const res = await askTerryChatbot({
         data: {
-          messages: newMessages
-        }
+          messages: newMessages,
+        },
       });
 
       if (res.success && res.text) {
@@ -158,8 +177,9 @@ export function TerryChatbot() {
           ...prev,
           {
             role: "model",
-            content: "Sorry, I'm having trouble connecting right now. Please try again in a moment."
-          }
+            content:
+              "Sorry, I'm having trouble connecting right now. Please try again in a moment.",
+          },
         ]);
       }
     } catch (err: any) {
@@ -172,26 +192,28 @@ export function TerryChatbot() {
 
   const parseMarkdown = (text: string) => {
     // Escaping
-    let html = text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-    
+    let html = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
     // Bold
     html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
     // List items
     html = html.replace(/^\s*[-*]\s+(.*)$/gm, "<li class='ml-4 list-disc'>$1</li>");
     // Newlines
     html = html.replace(/\n/g, "<br />");
-    
-    return <div dangerouslySetInnerHTML={{ __html: html }} className="text-xs leading-relaxed space-y-1" />;
+
+    return (
+      <div
+        dangerouslySetInnerHTML={{ __html: html }}
+        className="text-xs leading-relaxed space-y-1"
+      />
+    );
   };
 
   const QUICK_QUESTIONS = [
     "How to optimize washed coffee?",
     "What are the Ecoscore pillars?",
     "Explain Honey vs Natural process",
-    "How is suitability calculated?"
+    "How is suitability calculated?",
   ];
 
   return (
@@ -210,12 +232,14 @@ export function TerryChatbot() {
                   TerraAI
                   <Sparkles className="h-3 w-3 text-honey animate-pulse" />
                 </CardTitle>
-                <CardDescription className="text-[10px] font-medium text-forest">TerraBrew Smart Assistant</CardDescription>
+                <CardDescription className="text-[10px] font-medium text-forest">
+                  TerraBrew Smart Assistant
+                </CardDescription>
               </div>
             </div>
-            <Button 
-              size="icon" 
-              variant="ghost" 
+            <Button
+              size="icon"
+              variant="ghost"
               className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground"
               onClick={() => setIsOpen(false)}
             >
@@ -226,8 +250,8 @@ export function TerryChatbot() {
           {/* Chat Content */}
           <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((msg, idx) => (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className={`flex gap-2.5 max-w-[85%] ${msg.role === "user" ? "ml-auto flex-row-reverse" : ""}`}
               >
                 {msg.role === "model" && (
@@ -250,10 +274,10 @@ export function TerryChatbot() {
                     </Button>
                   </div>
                 )}
-                <div 
+                <div
                   className={`p-3 rounded-2xl shadow-sm text-xs leading-relaxed ${
-                    msg.role === "user" 
-                      ? "bg-forest text-cream rounded-tr-none" 
+                    msg.role === "user"
+                      ? "bg-forest text-cream rounded-tr-none"
                       : "bg-secondary/15 text-foreground rounded-tl-none border border-border/60"
                   }`}
                 >
@@ -268,9 +292,18 @@ export function TerryChatbot() {
                   <Bot className="h-4 w-4" />
                 </div>
                 <div className="bg-secondary/15 text-foreground p-3 rounded-2xl rounded-tl-none border border-border/60 flex items-center gap-1.5 shadow-sm">
-                  <span className="w-1.5 h-1.5 bg-forest rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-1.5 h-1.5 bg-forest rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-1.5 h-1.5 bg-forest rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <span
+                    className="w-1.5 h-1.5 bg-forest rounded-full animate-bounce"
+                    style={{ animationDelay: "0ms" }}
+                  />
+                  <span
+                    className="w-1.5 h-1.5 bg-forest rounded-full animate-bounce"
+                    style={{ animationDelay: "150ms" }}
+                  />
+                  <span
+                    className="w-1.5 h-1.5 bg-forest rounded-full animate-bounce"
+                    style={{ animationDelay: "300ms" }}
+                  />
                 </div>
               </div>
             )}
@@ -281,9 +314,9 @@ export function TerryChatbot() {
           {messages.length === 1 && !isLoading && (
             <div className="p-3 bg-secondary/5 border-t border-border/40 grid grid-cols-2 gap-1.5">
               {QUICK_QUESTIONS.map((q, idx) => (
-                <Button 
-                  key={idx} 
-                  variant="outline" 
+                <Button
+                  key={idx}
+                  variant="outline"
                   className="text-[10px] text-left h-auto py-1.5 px-2.5 border-border/60 hover:bg-secondary/20 hover:border-forest/40 rounded-xl justify-start whitespace-normal leading-normal font-medium text-muted-foreground"
                   onClick={() => handleSend(q)}
                 >
@@ -295,7 +328,7 @@ export function TerryChatbot() {
 
           {/* Input Footer */}
           <CardFooter className="p-3 border-t border-border/40 bg-background/50 backdrop-blur-sm flex gap-2">
-            <Input 
+            <Input
               placeholder="Ask TerraAI anything about coffee..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -307,20 +340,16 @@ export function TerryChatbot() {
               type="button"
               onClick={toggleListening}
               className={`rounded-xl h-10 w-10 shrink-0 border border-border/60 transition-all ${
-                isListening 
-                  ? "bg-red-500 text-white hover:bg-red-600 animate-pulse border-transparent" 
+                isListening
+                  ? "bg-red-500 text-white hover:bg-red-600 animate-pulse border-transparent"
                   : "bg-secondary/20 text-muted-foreground hover:text-foreground hover:bg-secondary/35"
               }`}
               title={isListening ? "Listening... click to stop" : "Start voice input"}
             >
-              {isListening ? (
-                <MicOff className="h-4 w-4" />
-              ) : (
-                <Mic className="h-4 w-4" />
-              )}
+              {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
             </Button>
-            <Button 
-              size="icon" 
+            <Button
+              size="icon"
               onClick={() => handleSend()}
               disabled={isLoading || !input.trim()}
               className="bg-forest text-cream hover:bg-forest-deep rounded-xl h-10 w-10 shrink-0 shadow-sm"
@@ -332,7 +361,7 @@ export function TerryChatbot() {
       )}
 
       {/* Floating Toggle Button */}
-      <Button 
+      <Button
         onClick={() => setIsOpen(!isOpen)}
         className="h-14 w-14 rounded-full bg-forest text-cream hover:bg-forest-deep shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-forest-deep flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 relative"
         style={{ background: "var(--gradient-eco)" }}

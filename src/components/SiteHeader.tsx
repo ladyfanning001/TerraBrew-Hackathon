@@ -1,8 +1,17 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { 
-  Bell, CloudSun, Search, LogOut, User, MapPin, Calendar, 
-  CheckCircle2, XCircle, AlertCircle, Inbox
+import {
+  Bell,
+  CloudSun,
+  Search,
+  LogOut,
+  User,
+  MapPin,
+  Calendar,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  Inbox,
 } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
@@ -22,7 +31,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 export function SiteHeader() {
   const { user, logout } = useAuth();
@@ -99,7 +114,10 @@ export function SiteHeader() {
           description,
           icon,
           color,
-          time: new Date(c.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+          time: new Date(c.created_at).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          }),
           status: c.status,
         };
       });
@@ -112,7 +130,10 @@ export function SiteHeader() {
           description: `Farmer request from ${c.farmer_name || "farmer"} at '${c.farm_name}' is pending review.`,
           icon: <Inbox className="h-4 w-4 text-blue-500" />,
           color: "text-blue-500 bg-blue-500/10",
-          time: new Date(c.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+          time: new Date(c.created_at).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          }),
           status: "pending",
         };
       });
@@ -132,9 +153,10 @@ export function SiteHeader() {
   };
 
   const displayName = user?.full_name || "Guest User";
-  const displaySub = user?.role === "farmer" 
-    ? (user.farm_name || "Petani Kopi")
-    : (user?.organization || "SEA Validator");
+  const displaySub =
+    user?.role === "farmer"
+      ? user.farm_name || "Petani Kopi"
+      : user?.organization || "SEA Validator";
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur-md md:px-6">
@@ -142,8 +164,13 @@ export function SiteHeader() {
 
       <div className="ml-auto flex items-center gap-2 md:gap-3">
         <div className="hidden lg:flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-3 py-1.5 text-xs">
-          <CloudSun className="h-4 w-4 text-honey animate-bounce" style={{ animationDuration: '3s' }} />
-          <span className="font-semibold text-foreground">{weather.name} · {weather.temp}°C</span>
+          <CloudSun
+            className="h-4 w-4 text-honey animate-bounce"
+            style={{ animationDuration: "3s" }}
+          />
+          <span className="font-semibold text-foreground">
+            {weather.name} · {weather.temp}°C
+          </span>
           <span className="text-muted-foreground">Humidity {weather.humidity}%</span>
         </div>
 
@@ -164,24 +191,39 @@ export function SiteHeader() {
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80 p-0 rounded-2xl border-border bg-card shadow-[var(--shadow-elegant)] overflow-hidden" align="end">
+          <PopoverContent
+            className="w-80 p-0 rounded-2xl border-border bg-card shadow-[var(--shadow-elegant)] overflow-hidden"
+            align="end"
+          >
             <div className="p-4 border-b border-border/40 bg-secondary/15 flex items-center justify-between">
               <span className="font-bold text-sm text-foreground">Notifications</span>
-              <Badge variant="outline" className="text-[10px] font-bold text-forest bg-forest/10 border-transparent">
+              <Badge
+                variant="outline"
+                className="text-[10px] font-bold text-forest bg-forest/10 border-transparent"
+              >
                 {unreadCount} Active
               </Badge>
             </div>
             <div className="max-h-[300px] overflow-y-auto divide-y divide-border/40">
               {notifications.length > 0 ? (
-                notifications.map((n) => (
-                  <div key={n.id} className="p-3.5 hover:bg-secondary/10 transition-colors flex gap-3 text-left">
-                    <div className={`h-8 w-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${n.color}`}>
+                notifications.map((n: any) => (
+                  <div
+                    key={n.id}
+                    className="p-3.5 hover:bg-secondary/10 transition-colors flex gap-3 text-left"
+                  >
+                    <div
+                      className={`h-8 w-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${n.color}`}
+                    >
                       {n.icon}
                     </div>
                     <div className="space-y-1">
                       <p className="text-xs font-bold text-foreground leading-none">{n.title}</p>
-                      <p className="text-[10px] text-muted-foreground leading-normal">{n.description}</p>
-                      <span className="text-[9px] font-semibold text-muted-foreground/80 block mt-1">{n.time}</span>
+                      <p className="text-[10px] text-muted-foreground leading-normal">
+                        {n.description}
+                      </p>
+                      <span className="text-[9px] font-semibold text-muted-foreground/80 block mt-1">
+                        {n.time}
+                      </span>
                     </div>
                   </div>
                 ))
@@ -207,24 +249,37 @@ export function SiteHeader() {
               </Avatar>
               <div className="hidden md:flex flex-col leading-tight text-left">
                 <span className="text-xs font-bold text-foreground">{displayName}</span>
-                <span className="text-[10px] text-muted-foreground font-semibold">{displaySub}</span>
+                <span className="text-[10px] text-muted-foreground font-semibold">
+                  {displaySub}
+                </span>
               </div>
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56 p-1 rounded-2xl border-border bg-card shadow-[var(--shadow-elegant)]" align="end">
+          <DropdownMenuContent
+            className="w-56 p-1 rounded-2xl border-border bg-card shadow-[var(--shadow-elegant)]"
+            align="end"
+          >
             <DropdownMenuLabel className="p-3 text-left">
               <p className="text-xs font-bold text-foreground leading-none">{displayName}</p>
-              <p className="text-[10px] text-muted-foreground font-medium truncate mt-1">{user?.email}</p>
+              <p className="text-[10px] text-muted-foreground font-medium truncate mt-1">
+                {user?.email}
+              </p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-border/40" />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => setIsProfileOpen(true)} className="p-2.5 text-xs font-semibold rounded-xl cursor-pointer hover:bg-secondary/20 flex items-center gap-2 text-foreground">
+              <DropdownMenuItem
+                onClick={() => setIsProfileOpen(true)}
+                className="p-2.5 text-xs font-semibold rounded-xl cursor-pointer hover:bg-secondary/20 flex items-center gap-2 text-foreground"
+              >
                 <User className="h-4 w-4 text-forest" />
                 View Profile Details
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator className="bg-border/40" />
-            <DropdownMenuItem onClick={logout} className="p-2.5 text-xs font-bold rounded-xl cursor-pointer text-destructive hover:bg-destructive/10 focus:bg-destructive/10 flex items-center gap-2">
+            <DropdownMenuItem
+              onClick={logout}
+              className="p-2.5 text-xs font-bold rounded-xl cursor-pointer text-destructive hover:bg-destructive/10 focus:bg-destructive/10 flex items-center gap-2"
+            >
               <LogOut className="h-4 w-4" />
               Sign Out
             </DropdownMenuItem>
@@ -261,15 +316,19 @@ export function SiteHeader() {
               {user?.role === "farmer" ? (
                 <div className="grid grid-cols-3 gap-2">
                   <span className="text-muted-foreground font-semibold">Farm Name:</span>
-                  <span className="col-span-2 font-bold text-foreground">{user?.farm_name || "N/A"}</span>
+                  <span className="col-span-2 font-bold text-foreground">
+                    {user?.farm_name || "N/A"}
+                  </span>
                 </div>
               ) : (
                 <div className="grid grid-cols-3 gap-2">
                   <span className="text-muted-foreground font-semibold">Organization:</span>
-                  <span className="col-span-2 font-bold text-foreground">{user?.organization || "N/A"}</span>
+                  <span className="col-span-2 font-bold text-foreground">
+                    {user?.organization || "N/A"}
+                  </span>
                 </div>
               )}
-              
+
               <div className="grid grid-cols-3 gap-2">
                 <span className="text-muted-foreground font-semibold">Assigned Region:</span>
                 <span className="col-span-2 font-bold text-foreground flex items-center gap-1.5">
@@ -282,13 +341,22 @@ export function SiteHeader() {
                 <span className="text-muted-foreground font-semibold">Joined Date:</span>
                 <span className="col-span-2 font-medium text-muted-foreground flex items-center gap-1.5">
                   <Calendar className="h-3.5 w-3.5" />
-                  {user?.created_at ? new Date(user.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "N/A"}
+                  {user?.created_at
+                    ? new Date(user.created_at).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })
+                    : "N/A"}
                 </span>
               </div>
             </div>
-            
+
             <div className="flex justify-end pt-2">
-              <Button onClick={() => setIsProfileOpen(false)} className="bg-forest text-cream hover:bg-forest-deep rounded-xl font-bold px-5">
+              <Button
+                onClick={() => setIsProfileOpen(false)}
+                className="bg-forest text-cream hover:bg-forest-deep rounded-xl font-bold px-5"
+              >
                 Close Profile
               </Button>
             </div>

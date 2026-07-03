@@ -4,12 +4,32 @@ import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { submitCertification, getFarmerCertifications } from "@/lib/auth-server";
 import { toast } from "sonner";
-import { 
-  Award, ShieldCheck, Leaf, Flame, Sparkles, AlertTriangle, 
-  ChevronRight, ChevronLeft, Send, CheckCircle, FileText, Download,
-  CloudSun, Calendar, HelpCircle, Camera
+import {
+  Award,
+  ShieldCheck,
+  Leaf,
+  Flame,
+  Sparkles,
+  AlertTriangle,
+  ChevronRight,
+  ChevronLeft,
+  Send,
+  CheckCircle,
+  FileText,
+  Download,
+  CloudSun,
+  Calendar,
+  HelpCircle,
+  Camera,
 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -17,13 +37,23 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/dashboard/certification")({
   head: () => ({
     meta: [
       { title: "Speciality Coffee Certification — TerraBrew" },
-      { name: "description", content: "Apply for speciality and sustainability certification validated by SEA." },
+      {
+        name: "description",
+        content: "Apply for speciality and sustainability certification validated by SEA.",
+      },
     ],
   }),
   component: CertificationPage,
@@ -55,9 +85,14 @@ function CertificationPage() {
   // env_kesesuaian = calculated:
   // Washed (0): suitable if rainfall >= 30 and temperature is between 20-30
   // Honey/Natural (1): suitable if rainfall < 50 and humidity < 75
-  const envKesesuaian = (envMetode === 0)
-    ? (envCurahHujan >= 30 && envSuhu >= 20 && envSuhu <= 30 ? 1 : 0)
-    : (envCurahHujan < 50 && envRh < 75 ? 1 : 0);
+  const envKesesuaian =
+    envMetode === 0
+      ? envCurahHujan >= 30 && envSuhu >= 20 && envSuhu <= 30
+        ? 1
+        : 0
+      : envCurahHujan < 50 && envRh < 75
+        ? 1
+        : 0;
 
   // Step 2: Economic Metrics
   const [ecoKualitas, setEcoKualitas] = useState(1); // 0=grade rendah, 1=grade 1/specialty
@@ -74,9 +109,18 @@ function CertificationPage() {
   const MIN_PRODUKSI = 0;
   const MAX_PRODUKSI = 3;
 
-  const ecoPendapatanNorm = Math.min(1, Math.max(0, (ecoPendapatan - MIN_PENDAPATAN) / (MAX_PENDAPATAN - MIN_PENDAPATAN)));
-  const ecoLuasLahanNorm = Math.min(1, Math.max(0, (ecoLuasLahan - MIN_LUAS_LAHAN) / (MAX_LUAS_LAHAN - MIN_LUAS_LAHAN)));
-  const ecoProduksiNorm = Math.min(1, Math.max(0, (ecoProduksi - MIN_PRODUKSI) / (MAX_PRODUKSI - MIN_PRODUKSI)));
+  const ecoPendapatanNorm = Math.min(
+    1,
+    Math.max(0, (ecoPendapatan - MIN_PENDAPATAN) / (MAX_PENDAPATAN - MIN_PENDAPATAN)),
+  );
+  const ecoLuasLahanNorm = Math.min(
+    1,
+    Math.max(0, (ecoLuasLahan - MIN_LUAS_LAHAN) / (MAX_LUAS_LAHAN - MIN_LUAS_LAHAN)),
+  );
+  const ecoProduksiNorm = Math.min(
+    1,
+    Math.max(0, (ecoProduksi - MIN_PRODUKSI) / (MAX_PRODUKSI - MIN_PRODUKSI)),
+  );
 
   // Step 3: Social Metrics
   const [sosKelompok, setSosKelompok] = useState(1); // 0=tidak aktif, 1=aktif
@@ -89,7 +133,8 @@ function CertificationPage() {
 
   // Calculations (decimal floats 0.0 - 1.0)
   const envScore = (envKesesuaian + envMetode + envEnergi + envPestisida + envKonservasi) / 5;
-  const ecoScore = (ecoKualitas + ecoPendapatanNorm + ecoLuasLahanNorm + ecoProduksiNorm + ecoKredit) / 5;
+  const ecoScore =
+    (ecoKualitas + ecoPendapatanNorm + ecoLuasLahanNorm + ecoProduksiNorm + ecoKredit) / 5;
   const sosScore = (sosKelompok + sosGender + sosPendidikan + sosHp + actualSosInternet) / 5;
   const ecoscore = (envScore + ecoScore + sosScore) / 3;
 
@@ -115,7 +160,7 @@ function CertificationPage() {
     },
     onError: (err: any) => {
       toast.error("Submission error: " + err.message);
-    }
+    },
   });
 
   const handleNextStep = () => {
@@ -133,11 +178,11 @@ function CertificationPage() {
         return;
       }
     }
-    setStep(prev => prev + 1);
+    setStep((prev) => prev + 1);
   };
 
   const handlePrevStep = () => {
-    setStep(prev => prev - 1);
+    setStep((prev) => prev - 1);
   };
 
   const handleSubmitApplication = () => {
@@ -173,25 +218,37 @@ function CertificationPage() {
         sosHp,
         sosInternet,
         sosScore,
-        ecoscore
-      }
+        ecoscore,
+      },
     });
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "approved":
-        return <Badge className="rounded-full bg-forest/15 text-forest border-transparent">Approved</Badge>;
+        return (
+          <Badge className="rounded-full bg-forest/15 text-forest border-transparent">
+            Approved
+          </Badge>
+        );
       case "rejected":
-        return <Badge className="rounded-full bg-destructive/15 text-destructive border-transparent">Rejected</Badge>;
+        return (
+          <Badge className="rounded-full bg-destructive/15 text-destructive border-transparent">
+            Rejected
+          </Badge>
+        );
       default:
-        return <Badge className="rounded-full bg-honey/15 text-honey border-transparent">Pending</Badge>;
+        return (
+          <Badge className="rounded-full bg-honey/15 text-honey border-transparent">Pending</Badge>
+        );
     }
   };
 
   const getAwardLevel = (score: number) => {
-    if (score >= 0.66) return { name: "High Sustainability", color: "text-[#10b981] bg-[#10b981]/15" };
-    if (score >= 0.33) return { name: "Medium Sustainability", color: "text-[#f59e0b] bg-[#f59e0b]/15" };
+    if (score >= 0.66)
+      return { name: "High Sustainability", color: "text-[#10b981] bg-[#10b981]/15" };
+    if (score >= 0.33)
+      return { name: "Medium Sustainability", color: "text-[#f59e0b] bg-[#f59e0b]/15" };
     return { name: "Low Sustainability", color: "text-[#ef4444] bg-[#ef4444]/15" };
   };
 
@@ -216,14 +273,17 @@ function CertificationPage() {
           <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-honey font-bold">
             <Award className="h-4 w-4" /> Specialty Coffee Pro Feature
           </div>
-          <h1 className="mt-1 text-2xl font-bold md:text-3xl text-primary">Specialty Coffee & Sustainability Certification</h1>
+          <h1 className="mt-1 text-2xl font-bold md:text-3xl text-primary">
+            Specialty Coffee & Sustainability Certification
+          </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Conduct a self-audit to verify your coffee quality and sustainability metrics with SEA validators.
+            Conduct a self-audit to verify your coffee quality and sustainability metrics with SEA
+            validators.
           </p>
         </div>
         {!isApplying && (
-          <Button 
-            onClick={() => setIsApplying(true)} 
+          <Button
+            onClick={() => setIsApplying(true)}
             className="rounded-full bg-forest text-cream hover:bg-forest-deep px-5 shadow-sm font-bold"
           >
             <Sparkles className="mr-2 h-4 w-4" /> Start New Audit
@@ -233,11 +293,24 @@ function CertificationPage() {
 
       {isApplying ? (
         /* WIZARD CARD */
-        <Card className="rounded-3xl border-border/80 overflow-hidden bg-card" style={{ boxShadow: "var(--shadow-card)" }}>
+        <Card
+          className="rounded-3xl border-border/80 overflow-hidden bg-card"
+          style={{ boxShadow: "var(--shadow-card)" }}
+        >
           <CardHeader className="bg-secondary/15 border-b border-border/40 p-6">
             <div className="flex justify-between items-center text-xs text-muted-foreground mb-4">
-              <span className="font-bold text-forest uppercase tracking-widest">STEP {step} OF 4</span>
-              <span className="font-bold">{step === 1 ? "Farm & Environment" : step === 2 ? "Economy & Quality" : step === 3 ? "Social Responsibility" : "Review & Ecoscore"}</span>
+              <span className="font-bold text-forest uppercase tracking-widest">
+                STEP {step} OF 4
+              </span>
+              <span className="font-bold">
+                {step === 1
+                  ? "Farm & Environment"
+                  : step === 2
+                    ? "Economy & Quality"
+                    : step === 3
+                      ? "Social Responsibility"
+                      : "Review & Ecoscore"}
+              </span>
             </div>
             <Progress value={(step / 4) * 100} className="h-1.5 bg-border" />
           </CardHeader>
@@ -247,9 +320,11 @@ function CertificationPage() {
               <div className="space-y-6">
                 <div className="grid gap-4 md:grid-cols-2 pb-6 border-b border-border/40">
                   <div className="space-y-2">
-                    <Label htmlFor="farm-name" className="text-sm font-bold text-foreground">FARM NAME / COOPERATIVE</Label>
-                    <Input 
-                      id="farm-name" 
+                    <Label htmlFor="farm-name" className="text-sm font-bold text-foreground">
+                      FARM NAME / COOPERATIVE
+                    </Label>
+                    <Input
+                      id="farm-name"
                       placeholder="Enter your farm name"
                       value={farmName}
                       onChange={(e) => setFarmName(e.target.value)}
@@ -257,9 +332,11 @@ function CertificationPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="variety" className="text-sm font-bold text-foreground">MAIN COFFEE VARIETY</Label>
-                    <Input 
-                      id="variety" 
+                    <Label htmlFor="variety" className="text-sm font-bold text-foreground">
+                      MAIN COFFEE VARIETY
+                    </Label>
+                    <Input
+                      id="variety"
                       placeholder="e.g. Arabica Gayo, Robusta Temanggung"
                       value={coffeeVariety}
                       onChange={(e) => setCoffeeVariety(e.target.value)}
@@ -267,9 +344,11 @@ function CertificationPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="country" className="text-sm font-bold text-foreground">COUNTRY</Label>
-                    <Input 
-                      id="country" 
+                    <Label htmlFor="country" className="text-sm font-bold text-foreground">
+                      COUNTRY
+                    </Label>
+                    <Input
+                      id="country"
                       placeholder="e.g. Indonesia"
                       value={country}
                       onChange={(e) => setCountry(e.target.value)}
@@ -277,9 +356,11 @@ function CertificationPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="region" className="text-sm font-bold text-foreground">REGION / PROVINCE</Label>
-                    <Input 
-                      id="region" 
+                    <Label htmlFor="region" className="text-sm font-bold text-foreground">
+                      REGION / PROVINCE
+                    </Label>
+                    <Input
+                      id="region"
                       placeholder="e.g. Aceh"
                       value={region}
                       onChange={(e) => setRegion(e.target.value)}
@@ -287,17 +368,22 @@ function CertificationPage() {
                     />
                   </div>
                 </div>
-
                 <div>
                   <h3 className="text-lg font-bold text-primary flex items-center gap-2">
                     <Leaf className="h-5 w-5 text-forest" />
                     Pillar 1: Environmental Sustainability
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-1">Measure ecological efficiency, soil conservation, water-saving processing, and clean energy use.</p>
-                </div>                 <div className="space-y-6">
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Measure ecological efficiency, soil conservation, water-saving processing, and
+                    clean energy use.
+                  </p>
+                </div>{" "}
+                <div className="space-y-6">
                   {/* Climate Conditions */}
                   <div className="bg-secondary/10 p-5 rounded-2xl border border-border/60 space-y-4">
-                    <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Environmental Conditions (BMKG Parameters)</h4>
+                    <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                      Environmental Conditions (BMKG Parameters)
+                    </h4>
                     <div className="grid gap-6 md:grid-cols-3">
                       {/* Temperature */}
                       <div className="space-y-2">
@@ -305,7 +391,13 @@ function CertificationPage() {
                           <span>TEMPERATURE</span>
                           <span className="text-forest font-semibold">{envSuhu.toFixed(1)} °C</span>
                         </Label>
-                        <Slider value={[envSuhu]} onValueChange={v => setEnvSuhu(v[0])} min={20} max={35} step={0.5} />
+                        <Slider
+                          value={[envSuhu]}
+                          onValueChange={(v) => setEnvSuhu(v[0])}
+                          min={20}
+                          max={35}
+                          step={0.5}
+                        />
                       </div>
                       {/* Relative Humidity */}
                       <div className="space-y-2">
@@ -313,15 +405,29 @@ function CertificationPage() {
                           <span>RELATIVE HUMIDITY</span>
                           <span className="text-forest font-semibold">{envRh.toFixed(1)} %</span>
                         </Label>
-                        <Slider value={[envRh]} onValueChange={v => setEnvRh(v[0])} min={40} max={90} step={1} />
+                        <Slider
+                          value={[envRh]}
+                          onValueChange={(v) => setEnvRh(v[0])}
+                          min={40}
+                          max={90}
+                          step={1}
+                        />
                       </div>
                       {/* Rainfall */}
                       <div className="space-y-2">
                         <Label className="text-xs font-bold flex justify-between">
                           <span>DAILY RAINFALL</span>
-                          <span className="text-forest font-semibold">{envCurahHujan.toFixed(1)} mm/day</span>
+                          <span className="text-forest font-semibold">
+                            {envCurahHujan.toFixed(1)} mm/day
+                          </span>
                         </Label>
-                        <Slider value={[envCurahHujan]} onValueChange={v => setEnvCurahHujan(v[0])} min={0} max={100} step={1} />
+                        <Slider
+                          value={[envCurahHujan]}
+                          onValueChange={(v) => setEnvCurahHujan(v[0])}
+                          min={0}
+                          max={100}
+                          step={1}
+                        />
                       </div>
                     </div>
                   </div>
@@ -330,17 +436,17 @@ function CertificationPage() {
                   <div className="space-y-2">
                     <Label className="text-xs font-bold">PROCESSING METHOD</Label>
                     <div className="flex gap-2">
-                      <Button 
-                        type="button" 
-                        variant={envMetode === 0 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={envMetode === 0 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${envMetode === 0 ? "bg-forest text-cream hover:bg-forest-deep" : "border-border/80 text-foreground"}`}
                         onClick={() => setEnvMetode(0)}
                       >
                         Washed Processing (0)
                       </Button>
-                      <Button 
-                        type="button" 
-                        variant={envMetode === 1 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={envMetode === 1 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${envMetode === 1 ? "bg-forest text-cream hover:bg-forest-deep" : "border-border/80 text-foreground"}`}
                         onClick={() => setEnvMetode(1)}
                       >
@@ -363,8 +469,8 @@ function CertificationPage() {
                         </Badge>
                       )}
                       <span className="text-xs text-muted-foreground">
-                        {envMetode === 0 
-                          ? "Washed needs Rainfall >= 30 mm/day and Temperature 20-30°C." 
+                        {envMetode === 0
+                          ? "Washed needs Rainfall >= 30 mm/day and Temperature 20-30°C."
                           : "Honey/Natural needs Rainfall < 50 mm/day and Humidity < 75%."}
                       </span>
                     </div>
@@ -374,17 +480,17 @@ function CertificationPage() {
                   <div className="space-y-2">
                     <Label className="text-xs font-bold">ENERGY TYPE</Label>
                     <div className="flex gap-2">
-                      <Button 
-                        type="button" 
-                        variant={envEnergi === 0 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={envEnergi === 0 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${envEnergi === 0 ? "bg-forest text-cream hover:bg-forest-deep" : "border-border/80 text-foreground"}`}
                         onClick={() => setEnvEnergi(0)}
                       >
                         Fossil Fuel (0)
                       </Button>
-                      <Button 
-                        type="button" 
-                        variant={envEnergi === 1 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={envEnergi === 1 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${envEnergi === 1 ? "bg-forest text-cream hover:bg-forest-deep" : "border-border/80 text-foreground"}`}
                         onClick={() => setEnvEnergi(1)}
                       >
@@ -397,17 +503,17 @@ function CertificationPage() {
                   <div className="space-y-2">
                     <Label className="text-xs font-bold">PESTICIDE USAGE</Label>
                     <div className="flex gap-2">
-                      <Button 
-                        type="button" 
-                        variant={envPestisida === 0 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={envPestisida === 0 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${envPestisida === 0 ? "bg-forest text-cream hover:bg-forest-deep" : "border-border/80 text-foreground"}`}
                         onClick={() => setEnvPestisida(0)}
                       >
                         Chemical Pesticides (0)
                       </Button>
-                      <Button 
-                        type="button" 
-                        variant={envPestisida === 1 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={envPestisida === 1 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${envPestisida === 1 ? "bg-forest text-cream hover:bg-forest-deep" : "border-border/80 text-foreground"}`}
                         onClick={() => setEnvPestisida(1)}
                       >
@@ -420,17 +526,17 @@ function CertificationPage() {
                   <div className="space-y-2">
                     <Label className="text-xs font-bold">SOIL CONSERVATION</Label>
                     <div className="flex gap-2">
-                      <Button 
-                        type="button" 
-                        variant={envKonservasi === 0 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={envKonservasi === 0 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${envKonservasi === 0 ? "bg-forest text-cream hover:bg-forest-deep" : "border-border/80 text-foreground"}`}
                         onClick={() => setEnvKonservasi(0)}
                       >
                         Monoculture (0)
                       </Button>
-                      <Button 
-                        type="button" 
-                        variant={envKonservasi === 1 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={envKonservasi === 1 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${envKonservasi === 1 ? "bg-forest text-cream hover:bg-forest-deep" : "border-border/80 text-foreground"}`}
                         onClick={() => setEnvKonservasi(1)}
                       >
@@ -439,9 +545,11 @@ function CertificationPage() {
                     </div>
                   </div>
                 </div>
-
                 <div className="flex justify-end p-4 bg-forest/5 rounded-xl border border-forest/15">
-                  <div className="text-sm font-bold text-primary">Sub-Total Environmental Score: <span className="text-forest text-lg ml-2">{(envScore).toFixed(2)} / 1.00</span></div>
+                  <div className="text-sm font-bold text-primary">
+                    Sub-Total Environmental Score:{" "}
+                    <span className="text-forest text-lg ml-2">{envScore.toFixed(2)} / 1.00</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -454,7 +562,10 @@ function CertificationPage() {
                     <Flame className="h-5 w-5 text-honey" />
                     Pillar 2: Economic Viability
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-1">Measure physical/cupping quality, premium income stability, productive land area, and access to finance.</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Measure physical/cupping quality, premium income stability, productive land
+                    area, and access to finance.
+                  </p>
                 </div>
 
                 <div className="space-y-6">
@@ -462,17 +573,17 @@ function CertificationPage() {
                   <div className="space-y-2">
                     <Label className="text-xs font-bold">COFFEE QUALITY</Label>
                     <div className="flex gap-2">
-                      <Button 
-                        type="button" 
-                        variant={ecoKualitas === 0 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={ecoKualitas === 0 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${ecoKualitas === 0 ? "bg-honey text-primary-foreground hover:bg-honey/95" : "border-border/80 text-foreground"}`}
                         onClick={() => setEcoKualitas(0)}
                       >
                         Low Grade (0)
                       </Button>
-                      <Button 
-                        type="button" 
-                        variant={ecoKualitas === 1 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={ecoKualitas === 1 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${ecoKualitas === 1 ? "bg-honey text-primary-foreground hover:bg-honey/95" : "border-border/80 text-foreground"}`}
                         onClick={() => setEcoKualitas(1)}
                       >
@@ -483,9 +594,14 @@ function CertificationPage() {
 
                   {/* eco_pendapatan */}
                   <div className="space-y-2">
-                    <Label htmlFor="eco-pendapatan" className="text-xs font-bold flex justify-between">
+                    <Label
+                      htmlFor="eco-pendapatan"
+                      className="text-xs font-bold flex justify-between"
+                    >
                       <span>ANNUAL HOUSEHOLD INCOME (Rp/year)</span>
-                      <span className="text-honey font-bold">Normalized: {ecoPendapatanNorm.toFixed(2)}</span>
+                      <span className="text-honey font-bold">
+                        Normalized: {ecoPendapatanNorm.toFixed(2)}
+                      </span>
                     </Label>
                     <Input
                       id="eco-pendapatan"
@@ -497,14 +613,21 @@ function CertificationPage() {
                       onChange={(e) => setEcoPendapatan(Number(e.target.value))}
                       className="bg-secondary/20 border-border/80 rounded-xl"
                     />
-                    <span className="text-[10px] text-muted-foreground block">Scale: Min Rp 0, Max Rp 150,000,000 / year</span>
+                    <span className="text-[10px] text-muted-foreground block">
+                      Scale: Min Rp 0, Max Rp 150,000,000 / year
+                    </span>
                   </div>
 
                   {/* eco_luas_lahan */}
                   <div className="space-y-2">
-                    <Label htmlFor="eco-luas-lahan" className="text-xs font-bold flex justify-between">
+                    <Label
+                      htmlFor="eco-luas-lahan"
+                      className="text-xs font-bold flex justify-between"
+                    >
                       <span>COFFEE LAND ACREAGE (hectares)</span>
-                      <span className="text-honey font-bold">Normalized: {ecoLuasLahanNorm.toFixed(2)}</span>
+                      <span className="text-honey font-bold">
+                        Normalized: {ecoLuasLahanNorm.toFixed(2)}
+                      </span>
                     </Label>
                     <Input
                       id="eco-luas-lahan"
@@ -517,14 +640,21 @@ function CertificationPage() {
                       onChange={(e) => setEcoLuasLahan(Number(e.target.value))}
                       className="bg-secondary/20 border-border/80 rounded-xl"
                     />
-                    <span className="text-[10px] text-muted-foreground block">Scale: Min 0 ha, Max 10 ha</span>
+                    <span className="text-[10px] text-muted-foreground block">
+                      Scale: Min 0 ha, Max 10 ha
+                    </span>
                   </div>
 
                   {/* eco_produksi */}
                   <div className="space-y-2">
-                    <Label htmlFor="eco-produksi" className="text-xs font-bold flex justify-between">
+                    <Label
+                      htmlFor="eco-produksi"
+                      className="text-xs font-bold flex justify-between"
+                    >
                       <span>COFFEE PRODUCTIVITY (ton/hectare/year)</span>
-                      <span className="text-honey font-bold">Normalized: {ecoProduksiNorm.toFixed(2)}</span>
+                      <span className="text-honey font-bold">
+                        Normalized: {ecoProduksiNorm.toFixed(2)}
+                      </span>
                     </Label>
                     <Input
                       id="eco-produksi"
@@ -537,24 +667,26 @@ function CertificationPage() {
                       onChange={(e) => setEcoProduksi(Number(e.target.value))}
                       className="bg-secondary/20 border-border/80 rounded-xl"
                     />
-                    <span className="text-[10px] text-muted-foreground block">Scale: Min 0 ton/ha, Max 3 ton/ha</span>
+                    <span className="text-[10px] text-muted-foreground block">
+                      Scale: Min 0 ton/ha, Max 3 ton/ha
+                    </span>
                   </div>
 
                   {/* eco_kredit */}
                   <div className="space-y-2">
                     <Label className="text-xs font-bold">BANK CREDIT / KUR ACCESS</Label>
                     <div className="flex gap-2">
-                      <Button 
-                        type="button" 
-                        variant={ecoKredit === 0 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={ecoKredit === 0 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${ecoKredit === 0 ? "bg-honey text-primary-foreground hover:bg-honey/95" : "border-border/80 text-foreground"}`}
                         onClick={() => setEcoKredit(0)}
                       >
                         No Credit Access (0)
                       </Button>
-                      <Button 
-                        type="button" 
-                        variant={ecoKredit === 1 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={ecoKredit === 1 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${ecoKredit === 1 ? "bg-honey text-primary-foreground hover:bg-honey/95" : "border-border/80 text-foreground"}`}
                         onClick={() => setEcoKredit(1)}
                       >
@@ -565,7 +697,10 @@ function CertificationPage() {
                 </div>
 
                 <div className="flex justify-end p-4 bg-honey/5 rounded-xl border border-honey/15">
-                  <div className="text-sm font-bold text-primary">Sub-Total Economic Score: <span className="text-honey text-lg ml-2">{(ecoScore).toFixed(2)} / 1.00</span></div>
+                  <div className="text-sm font-bold text-primary">
+                    Sub-Total Economic Score:{" "}
+                    <span className="text-honey text-lg ml-2">{ecoScore.toFixed(2)} / 1.00</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -578,7 +713,10 @@ function CertificationPage() {
                     <ShieldCheck className="h-5 w-5 text-chart-4" />
                     Pillar 3: Social Responsibility
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-1">Measure farmer cooperative participation, gender inclusion, worker training, and digital literacy.</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Measure farmer cooperative participation, gender inclusion, worker training, and
+                    digital literacy.
+                  </p>
                 </div>
 
                 <div className="space-y-6">
@@ -586,17 +724,17 @@ function CertificationPage() {
                   <div className="space-y-2">
                     <Label className="text-xs font-bold">COOPERATIVE / FARMER GROUP ACTIVE</Label>
                     <div className="flex gap-2">
-                      <Button 
-                        type="button" 
-                        variant={sosKelompok === 0 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={sosKelompok === 0 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${sosKelompok === 0 ? "bg-chart-4 text-cream hover:bg-chart-4/95" : "border-border/80 text-foreground"}`}
                         onClick={() => setSosKelompok(0)}
                       >
                         Inactive (0)
                       </Button>
-                      <Button 
-                        type="button" 
-                        variant={sosKelompok === 1 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={sosKelompok === 1 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${sosKelompok === 1 ? "bg-chart-4 text-cream hover:bg-chart-4/95" : "border-border/80 text-foreground"}`}
                         onClick={() => setSosKelompok(1)}
                       >
@@ -609,17 +747,17 @@ function CertificationPage() {
                   <div className="space-y-2">
                     <Label className="text-xs font-bold">GENDER EQUALITY & INCLUSION</Label>
                     <div className="flex gap-2">
-                      <Button 
-                        type="button" 
-                        variant={sosGender === 0 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={sosGender === 0 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${sosGender === 0 ? "bg-chart-4 text-cream hover:bg-chart-4/95" : "border-border/80 text-foreground"}`}
                         onClick={() => setSosGender(0)}
                       >
                         No / Unequal Roles (0)
                       </Button>
-                      <Button 
-                        type="button" 
-                        variant={sosGender === 1 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={sosGender === 1 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${sosGender === 1 ? "bg-chart-4 text-cream hover:bg-chart-4/95" : "border-border/80 text-foreground"}`}
                         onClick={() => setSosGender(1)}
                       >
@@ -632,17 +770,17 @@ function CertificationPage() {
                   <div className="space-y-2">
                     <Label className="text-xs font-bold">FARMER EDUCATION LEVEL</Label>
                     <div className="flex gap-2">
-                      <Button 
-                        type="button" 
-                        variant={sosPendidikan === 0 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={sosPendidikan === 0 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${sosPendidikan === 0 ? "bg-chart-4 text-cream hover:bg-chart-4/95" : "border-border/80 text-foreground"}`}
                         onClick={() => setSosPendidikan(0)}
                       >
                         Primary School / SD (0)
                       </Button>
-                      <Button 
-                        type="button" 
-                        variant={sosPendidikan === 1 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={sosPendidikan === 1 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${sosPendidikan === 1 ? "bg-chart-4 text-cream hover:bg-chart-4/95" : "border-border/80 text-foreground"}`}
                         onClick={() => setSosPendidikan(1)}
                       >
@@ -655,9 +793,9 @@ function CertificationPage() {
                   <div className="space-y-2">
                     <Label className="text-xs font-bold">MOBILE PHONE & SIGNAL ACCESS</Label>
                     <div className="flex gap-2">
-                      <Button 
-                        type="button" 
-                        variant={sosHp === 0 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={sosHp === 0 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${sosHp === 0 ? "bg-chart-4 text-cream hover:bg-chart-4/95" : "border-border/80 text-foreground"}`}
                         onClick={() => {
                           setSosHp(0);
@@ -666,9 +804,9 @@ function CertificationPage() {
                       >
                         No Signal/Phone (0)
                       </Button>
-                      <Button 
-                        type="button" 
-                        variant={sosHp === 1 ? "default" : "outline"} 
+                      <Button
+                        type="button"
+                        variant={sosHp === 1 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${sosHp === 1 ? "bg-chart-4 text-cream hover:bg-chart-4/95" : "border-border/80 text-foreground"}`}
                         onClick={() => setSosHp(1)}
                       >
@@ -681,22 +819,26 @@ function CertificationPage() {
                   <div className="space-y-2">
                     <Label className="text-xs font-bold flex justify-between">
                       <span>INTERNET ACCESS</span>
-                      {sosHp === 0 && <span className="text-[10px] text-destructive font-semibold">Requires Phone/Signal Access</span>}
+                      {sosHp === 0 && (
+                        <span className="text-[10px] text-destructive font-semibold">
+                          Requires Phone/Signal Access
+                        </span>
+                      )}
                     </Label>
                     <div className="flex gap-2">
-                      <Button 
-                        type="button" 
+                      <Button
+                        type="button"
                         disabled={sosHp === 0}
-                        variant={actualSosInternet === 0 ? "default" : "outline"} 
+                        variant={actualSosInternet === 0 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${actualSosInternet === 0 ? "bg-chart-4 text-cream hover:bg-chart-4/95" : "border-border/80 text-foreground"}`}
                         onClick={() => setSosInternet(0)}
                       >
                         No Access (0)
                       </Button>
-                      <Button 
-                        type="button" 
+                      <Button
+                        type="button"
                         disabled={sosHp === 0}
-                        variant={actualSosInternet === 1 ? "default" : "outline"} 
+                        variant={actualSosInternet === 1 ? "default" : "outline"}
                         className={`flex-1 rounded-xl h-11 font-semibold ${actualSosInternet === 1 ? "bg-chart-4 text-cream hover:bg-chart-4/95" : "border-border/80 text-foreground"}`}
                         onClick={() => setSosInternet(1)}
                       >
@@ -707,7 +849,10 @@ function CertificationPage() {
                 </div>
 
                 <div className="flex justify-end p-4 bg-chart-4/5 rounded-xl border border-chart-4/15">
-                  <div className="text-sm font-bold text-primary">Sub-Total Social Score: <span className="text-chart-4 text-lg ml-2">{(sosScore).toFixed(2)} / 1.00</span></div>
+                  <div className="text-sm font-bold text-primary">
+                    Sub-Total Social Score:{" "}
+                    <span className="text-chart-4 text-lg ml-2">{sosScore.toFixed(2)} / 1.00</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -720,42 +865,71 @@ function CertificationPage() {
                     <CheckCircle className="h-5 w-5 text-forest animate-pulse" />
                     Review Self-Audit Results
                   </h3>
-                  <p className="text-xs text-muted-foreground mt-1">Below is the final Ecoscore calculation that will be submitted to the SEA Validator.</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Below is the final Ecoscore calculation that will be submitted to the SEA
+                    Validator.
+                  </p>
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2">
                   <Card className="rounded-2xl border-border bg-secondary/5 overflow-hidden">
                     <CardHeader className="bg-primary/5 p-4 border-b border-border/40">
-                      <CardTitle className="text-sm font-bold text-primary">Indicators Score Summary</CardTitle>
+                      <CardTitle className="text-sm font-bold text-primary">
+                        Indicators Score Summary
+                      </CardTitle>
                     </CardHeader>
                     <CardContent className="p-4 space-y-3.5 text-sm">
                       <div className="flex justify-between items-center">
-                        <span className="flex items-center gap-2"><Leaf className="h-4 w-4 text-forest" /> Environmental Score:</span>
-                        <span className="font-bold text-forest">{(envScore).toFixed(2)} / 1.00</span>
+                        <span className="flex items-center gap-2">
+                          <Leaf className="h-4 w-4 text-forest" /> Environmental Score:
+                        </span>
+                        <span className="font-bold text-forest">{envScore.toFixed(2)} / 1.00</span>
                       </div>
-                      <Progress value={envScore * 100} className="h-1 bg-border" style={{ "--progress-background": "var(--forest)" } as any} />
-                      
-                      <div className="flex justify-between items-center">
-                        <span className="flex items-center gap-2"><Flame className="h-4 w-4 text-honey" /> Economic Score:</span>
-                        <span className="font-bold text-honey">{(ecoScore).toFixed(2)} / 1.00</span>
-                      </div>
-                      <Progress value={ecoScore * 100} className="h-1 bg-border" style={{ "--progress-background": "var(--honey)" } as any} />
+                      <Progress
+                        value={envScore * 100}
+                        className="h-1 bg-border"
+                        style={{ "--progress-background": "var(--forest)" } as any}
+                      />
 
                       <div className="flex justify-between items-center">
-                        <span className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-chart-4" /> Social Score:</span>
-                        <span className="font-bold text-chart-4">{(sosScore).toFixed(2)} / 1.00</span>
+                        <span className="flex items-center gap-2">
+                          <Flame className="h-4 w-4 text-honey" /> Economic Score:
+                        </span>
+                        <span className="font-bold text-honey">{ecoScore.toFixed(2)} / 1.00</span>
                       </div>
-                      <Progress value={sosScore * 100} className="h-1 bg-border" style={{ "--progress-background": "var(--chart-4)" } as any} />
+                      <Progress
+                        value={ecoScore * 100}
+                        className="h-1 bg-border"
+                        style={{ "--progress-background": "var(--honey)" } as any}
+                      />
+
+                      <div className="flex justify-between items-center">
+                        <span className="flex items-center gap-2">
+                          <ShieldCheck className="h-4 w-4 text-chart-4" /> Social Score:
+                        </span>
+                        <span className="font-bold text-chart-4">{sosScore.toFixed(2)} / 1.00</span>
+                      </div>
+                      <Progress
+                        value={sosScore * 100}
+                        className="h-1 bg-border"
+                        style={{ "--progress-background": "var(--chart-4)" } as any}
+                      />
                     </CardContent>
                   </Card>
 
                   <Card className="rounded-2xl border-transparent bg-linear-to-br from-forest/10 to-primary/5 flex flex-col justify-center items-center p-6 text-center border">
-                    <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Overall Ecoscore Calculation</div>
-                    <div className="text-5xl font-black text-forest mt-2">{(ecoscore).toFixed(2)}</div>
+                    <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                      Overall Ecoscore Calculation
+                    </div>
+                    <div className="text-5xl font-black text-forest mt-2">
+                      {ecoscore.toFixed(2)}
+                    </div>
                     <div className="text-[10px] uppercase font-bold text-primary mt-2">
                       Average of 3 Pillars (env + eco + sos) / 3
                     </div>
-                    <Badge className={`mt-4 rounded-full font-bold text-xs px-3 py-1 ${getAwardLevel(ecoscore).color}`}>
+                    <Badge
+                      className={`mt-4 rounded-full font-bold text-xs px-3 py-1 ${getAwardLevel(ecoscore).color}`}
+                    >
                       Award: {getAwardLevel(ecoscore).name}
                     </Badge>
                   </Card>
@@ -765,7 +939,9 @@ function CertificationPage() {
                   <AlertTriangle className="h-5 w-5 shrink-0" />
                   <div>
                     <strong className="block font-bold mb-0.5">Audit Validation Disclaimer:</strong>
-                    The Ecoscore above is calculated based on self-assessment. These metrics will be directly verified by an independent SEA (Eco-Agribusiness Certification) auditor before an official certificate is released.
+                    The Ecoscore above is calculated based on self-assessment. These metrics will be
+                    directly verified by an independent SEA (Eco-Agribusiness Certification) auditor
+                    before an official certificate is released.
                   </div>
                 </div>
 
@@ -792,26 +968,38 @@ function CertificationPage() {
           </CardContent>
           <CardFooter className="bg-secondary/10 border-t border-border/40 p-6 flex justify-between">
             {step > 1 ? (
-              <Button onClick={handlePrevStep} variant="outline" className="border-border rounded-xl">
+              <Button
+                onClick={handlePrevStep}
+                variant="outline"
+                className="border-border rounded-xl"
+              >
                 <ChevronLeft className="mr-1 h-4 w-4" /> Back
               </Button>
             ) : (
-              <Button onClick={() => setIsApplying(false)} variant="ghost" className="text-muted-foreground hover:text-foreground">
+              <Button
+                onClick={() => setIsApplying(false)}
+                variant="ghost"
+                className="text-muted-foreground hover:text-foreground"
+              >
                 Cancel
               </Button>
             )}
 
             {step < 4 ? (
-              <Button onClick={handleNextStep} className="bg-forest text-cream hover:bg-forest-deep rounded-xl px-5">
+              <Button
+                onClick={handleNextStep}
+                className="bg-forest text-cream hover:bg-forest-deep rounded-xl px-5"
+              >
                 Next <ChevronRight className="ml-1 h-4 w-4" />
               </Button>
             ) : (
-              <Button 
-                onClick={handleSubmitApplication} 
+              <Button
+                onClick={handleSubmitApplication}
                 disabled={submitMutation.isPending}
                 className="bg-forest text-cream hover:bg-forest-deep rounded-xl px-6 font-bold shadow-md"
               >
-                {submitMutation.isPending ? "Submitting..." : "Submit Application"} <Send className="ml-2 h-4 w-4" />
+                {submitMutation.isPending ? "Submitting..." : "Submit Application"}{" "}
+                <Send className="ml-2 h-4 w-4" />
               </Button>
             )}
           </CardFooter>
@@ -820,35 +1008,57 @@ function CertificationPage() {
         /* HISTORY AND CERTIFICATES LIST */
         <div className="space-y-6">
           {isLoading ? (
-            <div className="p-8 text-center text-muted-foreground">Loading certification data...</div>
+            <div className="p-8 text-center text-muted-foreground">
+              Loading certification data...
+            </div>
           ) : certifications && certifications.length > 0 ? (
             <div className="grid gap-6">
               <div className="grid gap-4 md:grid-cols-3">
-                <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+                <Card
+                  className="rounded-2xl border-border"
+                  style={{ boxShadow: "var(--shadow-soft)" }}
+                >
                   <CardHeader className="pb-3">
                     <CardDescription>Pending Review</CardDescription>
-                    <CardTitle className="text-3xl font-extrabold text-honey">{pendingCertifications.length}</CardTitle>
+                    <CardTitle className="text-3xl font-extrabold text-honey">
+                      {pendingCertifications.length}
+                    </CardTitle>
                   </CardHeader>
                 </Card>
-                <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+                <Card
+                  className="rounded-2xl border-border"
+                  style={{ boxShadow: "var(--shadow-soft)" }}
+                >
                   <CardHeader className="pb-3">
                     <CardDescription>Approved</CardDescription>
-                    <CardTitle className="text-3xl font-extrabold text-forest">{approvedCertifications.length}</CardTitle>
+                    <CardTitle className="text-3xl font-extrabold text-forest">
+                      {approvedCertifications.length}
+                    </CardTitle>
                   </CardHeader>
                 </Card>
-                <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+                <Card
+                  className="rounded-2xl border-border"
+                  style={{ boxShadow: "var(--shadow-soft)" }}
+                >
                   <CardHeader className="pb-3">
                     <CardDescription>Rejected</CardDescription>
-                    <CardTitle className="text-3xl font-extrabold text-destructive">{rejectedCertifications.length}</CardTitle>
+                    <CardTitle className="text-3xl font-extrabold text-destructive">
+                      {rejectedCertifications.length}
+                    </CardTitle>
                   </CardHeader>
                 </Card>
               </div>
 
               <div className="grid gap-6 lg:grid-cols-2">
-                <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+                <Card
+                  className="rounded-2xl border-border"
+                  style={{ boxShadow: "var(--shadow-soft)" }}
+                >
                   <CardHeader>
                     <CardTitle className="text-primary font-bold">Pending Review</CardTitle>
-                    <CardDescription>Applications currently awaiting SEA validation.</CardDescription>
+                    <CardDescription>
+                      Applications currently awaiting SEA validation.
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="p-0">
                     {pendingCertifications.length > 0 ? (
@@ -864,12 +1074,25 @@ function CertificationPage() {
                           </thead>
                           <tbody>
                             {pendingCertifications.map((c: any) => (
-                              <tr key={c.id} className="border-t border-border/60 hover:bg-secondary/15 transition-colors">
-                                <td className="py-4 px-6 font-bold text-foreground">{c.farm_name}</td>
-                                <td className="py-4 px-6 text-muted-foreground">{c.coffee_variety}</td>
-                                <td className="py-4 px-6 text-center font-bold text-honey">{Number(c.ecoscore).toFixed(2)}</td>
+                              <tr
+                                key={c.id}
+                                className="border-t border-border/60 hover:bg-secondary/15 transition-colors"
+                              >
+                                <td className="py-4 px-6 font-bold text-foreground">
+                                  {c.farm_name}
+                                </td>
+                                <td className="py-4 px-6 text-muted-foreground">
+                                  {c.coffee_variety}
+                                </td>
+                                <td className="py-4 px-6 text-center font-bold text-honey">
+                                  {Number(c.ecoscore).toFixed(2)}
+                                </td>
                                 <td className="py-4 px-6 text-muted-foreground text-xs">
-                                  {new Date(c.created_at).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })}
+                                  {new Date(c.created_at).toLocaleDateString("en-US", {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  })}
                                 </td>
                               </tr>
                             ))}
@@ -877,15 +1100,22 @@ function CertificationPage() {
                         </table>
                       </div>
                     ) : (
-                      <div className="p-6 text-center text-muted-foreground">No pending applications found.</div>
+                      <div className="p-6 text-center text-muted-foreground">
+                        No pending applications found.
+                      </div>
                     )}
                   </CardContent>
                 </Card>
 
-                <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+                <Card
+                  className="rounded-2xl border-border"
+                  style={{ boxShadow: "var(--shadow-soft)" }}
+                >
                   <CardHeader>
                     <CardTitle className="text-primary font-bold">Approved</CardTitle>
-                    <CardDescription>Certifications fully verified and approved by SEA.</CardDescription>
+                    <CardDescription>
+                      Certifications fully verified and approved by SEA.
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="p-0">
                     {approvedCertifications.length > 0 ? (
@@ -901,13 +1131,22 @@ function CertificationPage() {
                           </thead>
                           <tbody>
                             {approvedCertifications.map((c: any) => (
-                              <tr key={c.id} className="border-t border-border/60 hover:bg-secondary/15 transition-colors">
+                              <tr
+                                key={c.id}
+                                className="border-t border-border/60 hover:bg-secondary/15 transition-colors"
+                              >
                                 <td className="py-4 px-6 font-bold text-foreground">
                                   <div>{c.farm_name}</div>
-                                  <div className="text-xs text-muted-foreground font-normal">{c.coffee_variety}</div>
+                                  <div className="text-xs text-muted-foreground font-normal">
+                                    {c.coffee_variety}
+                                  </div>
                                 </td>
-                                <td className="py-4 px-6 text-center font-bold text-forest">{Number(c.ecoscore).toFixed(2)}</td>
-                                <td className="py-4 px-6 text-xs text-muted-foreground">{c.validator_name || "SEA Auditor"}</td>
+                                <td className="py-4 px-6 text-center font-bold text-forest">
+                                  {Number(c.ecoscore).toFixed(2)}
+                                </td>
+                                <td className="py-4 px-6 text-xs text-muted-foreground">
+                                  {c.validator_name || "SEA Auditor"}
+                                </td>
                                 <td className="py-4 px-6 text-xs text-muted-foreground">
                                   {c.validator_photo ? "Available" : "-"}
                                 </td>
@@ -917,17 +1156,24 @@ function CertificationPage() {
                         </table>
                       </div>
                     ) : (
-                      <div className="p-6 text-center text-muted-foreground">No approved certificates yet.</div>
+                      <div className="p-6 text-center text-muted-foreground">
+                        No approved certificates yet.
+                      </div>
                     )}
                   </CardContent>
                 </Card>
               </div>
 
               {rejectedCertifications.length > 0 && (
-                <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+                <Card
+                  className="rounded-2xl border-border"
+                  style={{ boxShadow: "var(--shadow-soft)" }}
+                >
                   <CardHeader>
                     <CardTitle className="text-primary font-bold">Rejected</CardTitle>
-                    <CardDescription>Applications rejected by SEA along with validator feedback.</CardDescription>
+                    <CardDescription>
+                      Applications rejected by SEA along with validator feedback.
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="p-0">
                     <div className="overflow-x-auto">
@@ -942,12 +1188,23 @@ function CertificationPage() {
                         </thead>
                         <tbody>
                           {rejectedCertifications.map((c: any) => (
-                            <tr key={c.id} className="border-t border-border/60 hover:bg-secondary/15 transition-colors">
+                            <tr
+                              key={c.id}
+                              className="border-t border-border/60 hover:bg-secondary/15 transition-colors"
+                            >
                               <td className="py-4 px-6 font-bold text-foreground">{c.farm_name}</td>
-                              <td className="py-4 px-6 text-center font-bold text-destructive">{Number(c.ecoscore).toFixed(2)}</td>
-                              <td className="py-4 px-6 text-xs text-muted-foreground max-w-sm">{c.validator_feedback || "-"}</td>
+                              <td className="py-4 px-6 text-center font-bold text-destructive">
+                                {Number(c.ecoscore).toFixed(2)}
+                              </td>
+                              <td className="py-4 px-6 text-xs text-muted-foreground max-w-sm">
+                                {c.validator_feedback || "-"}
+                              </td>
                               <td className="py-4 px-6 text-muted-foreground text-xs">
-                                {new Date(c.created_at).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })}
+                                {new Date(c.created_at).toLocaleDateString("en-US", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                })}
                               </td>
                             </tr>
                           ))}
@@ -958,10 +1215,17 @@ function CertificationPage() {
                 </Card>
               )}
 
-              <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+              <Card
+                className="rounded-2xl border-border"
+                style={{ boxShadow: "var(--shadow-soft)" }}
+              >
                 <CardHeader>
-                  <CardTitle className="text-primary font-bold">Certification Application History</CardTitle>
-                  <CardDescription>Status of all certification requests in one list.</CardDescription>
+                  <CardTitle className="text-primary font-bold">
+                    Certification Application History
+                  </CardTitle>
+                  <CardDescription>
+                    Status of all certification requests in one list.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
@@ -978,39 +1242,61 @@ function CertificationPage() {
                       </thead>
                       <tbody>
                         {certifications.map((c: any) => (
-                          <tr key={c.id} className="border-t border-border/60 hover:bg-secondary/15 transition-colors">
+                          <tr
+                            key={c.id}
+                            className="border-t border-border/60 hover:bg-secondary/15 transition-colors"
+                          >
                             <td className="py-4 px-6 font-bold text-foreground">{c.farm_name}</td>
                             <td className="py-4 px-6 text-muted-foreground">{c.coffee_variety}</td>
-                            <td className="py-4 px-6 text-center font-bold text-forest">{Number(c.ecoscore).toFixed(2)}</td>
+                            <td className="py-4 px-6 text-center font-bold text-forest">
+                              {Number(c.ecoscore).toFixed(2)}
+                            </td>
                             <td className="py-4 px-6">{getStatusBadge(c.status)}</td>
                             <td className="py-4 px-6 text-muted-foreground text-xs">
-                              {new Date(c.created_at).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })}
+                              {new Date(c.created_at).toLocaleDateString("en-US", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              })}
                             </td>
                             <td className="py-4 px-6 text-xs text-muted-foreground max-w-xs">
                               {c.validator_feedback ? (
                                 <div className="flex flex-col gap-1">
-                                  <span className="block truncate" style={{ maxWidth: 150 }}>{c.validator_feedback}</span>
+                                  <span className="block truncate" style={{ maxWidth: 150 }}>
+                                    {c.validator_feedback}
+                                  </span>
                                   {c.validator_photo && (
                                     <Dialog>
                                       <DialogTrigger asChild>
                                         <button className="text-forest font-bold text-[10px] hover:underline flex items-center gap-1 mt-0.5 focus:outline-none">
-                                          <Camera className="h-3.5 w-3.5 animate-pulse" /> View On-Site Proof
+                                          <Camera className="h-3.5 w-3.5 animate-pulse" /> View
+                                          On-Site Proof
                                         </button>
                                       </DialogTrigger>
-                                      <DialogContent className="max-w-md rounded-3xl border-border bg-card p-6" style={{ boxShadow: "var(--shadow-elegant)" }}>
+                                      <DialogContent
+                                        className="max-w-md rounded-3xl border-border bg-card p-6"
+                                        style={{ boxShadow: "var(--shadow-elegant)" }}
+                                      >
                                         <DialogHeader>
                                           <DialogTitle className="text-sm font-bold text-primary flex items-center gap-1.5">
-                                            <ShieldCheck className="h-4 w-4 text-forest" /> On-Site Validation Proof
+                                            <ShieldCheck className="h-4 w-4 text-forest" /> On-Site
+                                            Validation Proof
                                           </DialogTitle>
                                           <DialogDescription className="text-[10px]">
                                             Photo taken during on-site visit for '{c.farm_name}'
                                           </DialogDescription>
                                         </DialogHeader>
                                         <div className="rounded-2xl overflow-hidden border border-border/80 aspect-video shadow-inner mt-2">
-                                          <img src={c.validator_photo} alt="On-site proof" className="w-full h-full object-cover" />
+                                          <img
+                                            src={c.validator_photo}
+                                            alt="On-site proof"
+                                            className="w-full h-full object-cover"
+                                          />
                                         </div>
                                         <div className="text-xs text-foreground mt-3 bg-secondary/10 p-3 rounded-xl border border-border/40">
-                                          <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Feedback Comments</p>
+                                          <p className="font-bold text-[10px] text-muted-foreground uppercase tracking-widest mb-1">
+                                            Feedback Comments
+                                          </p>
                                           <p className="leading-relaxed">{c.validator_feedback}</p>
                                         </div>
                                       </DialogContent>
@@ -1032,19 +1318,28 @@ function CertificationPage() {
           ) : (
             <div className="grid gap-6">
               <div className="grid gap-4 md:grid-cols-3">
-                <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+                <Card
+                  className="rounded-2xl border-border"
+                  style={{ boxShadow: "var(--shadow-soft)" }}
+                >
                   <CardHeader className="pb-3">
                     <CardDescription>Pending Review</CardDescription>
                     <CardTitle className="text-3xl font-extrabold text-honey">0</CardTitle>
                   </CardHeader>
                 </Card>
-                <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+                <Card
+                  className="rounded-2xl border-border"
+                  style={{ boxShadow: "var(--shadow-soft)" }}
+                >
                   <CardHeader className="pb-3">
                     <CardDescription>Approved</CardDescription>
                     <CardTitle className="text-3xl font-extrabold text-forest">0</CardTitle>
                   </CardHeader>
                 </Card>
-                <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+                <Card
+                  className="rounded-2xl border-border"
+                  style={{ boxShadow: "var(--shadow-soft)" }}
+                >
                   <CardHeader className="pb-3">
                     <CardDescription>Rejected</CardDescription>
                     <CardTitle className="text-3xl font-extrabold text-destructive">0</CardTitle>
@@ -1053,31 +1348,52 @@ function CertificationPage() {
               </div>
 
               <div className="grid gap-6 lg:grid-cols-2">
-                <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+                <Card
+                  className="rounded-2xl border-border"
+                  style={{ boxShadow: "var(--shadow-soft)" }}
+                >
                   <CardHeader>
                     <CardTitle className="text-primary font-bold">Pending Review</CardTitle>
-                    <CardDescription>Applications currently awaiting SEA validation.</CardDescription>
+                    <CardDescription>
+                      Applications currently awaiting SEA validation.
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="p-6 text-center text-muted-foreground">No pending applications found.</div>
+                    <div className="p-6 text-center text-muted-foreground">
+                      No pending applications found.
+                    </div>
                   </CardContent>
                 </Card>
 
-                <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+                <Card
+                  className="rounded-2xl border-border"
+                  style={{ boxShadow: "var(--shadow-soft)" }}
+                >
                   <CardHeader>
                     <CardTitle className="text-primary font-bold">Approved</CardTitle>
-                    <CardDescription>Certifications fully verified and approved by SEA.</CardDescription>
+                    <CardDescription>
+                      Certifications fully verified and approved by SEA.
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="p-6 text-center text-muted-foreground">No approved certificates yet.</div>
+                    <div className="p-6 text-center text-muted-foreground">
+                      No approved certificates yet.
+                    </div>
                   </CardContent>
                 </Card>
               </div>
 
-              <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+              <Card
+                className="rounded-2xl border-border"
+                style={{ boxShadow: "var(--shadow-soft)" }}
+              >
                 <CardHeader>
-                  <CardTitle className="text-primary font-bold">Certification Application History</CardTitle>
-                  <CardDescription>Status of all certification requests in one list.</CardDescription>
+                  <CardTitle className="text-primary font-bold">
+                    Certification Application History
+                  </CardTitle>
+                  <CardDescription>
+                    Status of all certification requests in one list.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="rounded-2xl border border-dashed border-border/60 p-8 text-center space-y-4">
@@ -1085,12 +1401,18 @@ function CertificationPage() {
                       <Award className="h-8 w-8" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-foreground">No certifications submitted yet</h3>
+                      <h3 className="text-lg font-bold text-foreground">
+                        No certifications submitted yet
+                      </h3>
                       <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
-                        Conduct a self-assessment of your Ecoscore (Environmental, Economic, Social) to apply for official verification from SEA.
+                        Conduct a self-assessment of your Ecoscore (Environmental, Economic, Social)
+                        to apply for official verification from SEA.
                       </p>
                     </div>
-                    <Button onClick={() => setIsApplying(true)} className="rounded-full bg-forest text-cream hover:bg-forest-deep px-5 shadow-sm font-bold mt-2">
+                    <Button
+                      onClick={() => setIsApplying(true)}
+                      className="rounded-full bg-forest text-cream hover:bg-forest-deep px-5 shadow-sm font-bold mt-2"
+                    >
                       Start First Application
                     </Button>
                   </div>

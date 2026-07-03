@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getDb } from "./db";
-import { crypto } from "crypto";
 
 // In-memory fallback database for Mock Mode (when PostgreSQL is not running)
 const mockCertifications: any[] = [];
@@ -10,9 +9,10 @@ const mockProfiles: any[] = [];
 // Web Crypto SHA-256 Hashing helper
 async function hashPassword(password: string): Promise<string> {
   // Use global webcrypto if available (e.g. in newer Node / Cloudflare)
-  const subtle = typeof window === 'undefined' 
-    ? (globalThis.crypto?.subtle || (await import("crypto")).webcrypto.subtle)
-    : null;
+  const subtle =
+    typeof window === "undefined"
+      ? globalThis.crypto?.subtle || (await import("crypto")).webcrypto.subtle
+      : null;
 
   if (!subtle) {
     throw new Error("Crypto API not available");
@@ -28,20 +28,22 @@ async function hashPassword(password: string): Promise<string> {
 
 // 1. REGISTER USER
 export const registerUser = createServerFn({ method: "POST" })
-  .validator((d: {
-    fullName: string;
-    email: string;
-    password: string;
-    role: "farmer" | "sea";
-    farmName?: string;
-    organization?: string;
-    country?: string;
-    region?: string;
-  }) => d)
+  .validator(
+    (d: {
+      fullName: string;
+      email: string;
+      password: string;
+      role: "farmer" | "sea";
+      farmName?: string;
+      organization?: string;
+      country?: string;
+      region?: string;
+    }) => d,
+  )
   .handler(async ({ data }) => {
     const db = await getDb();
     if (!db) {
-      const existing = mockProfiles.find(p => p.email === data.email.toLowerCase());
+      const existing = mockProfiles.find((p) => p.email === data.email.toLowerCase());
       if (existing) {
         throw new Error("Email already registered");
       }
@@ -57,7 +59,7 @@ export const registerUser = createServerFn({ method: "POST" })
         organization: data.organization || null,
         country: data.country || null,
         region: data.region || null,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       };
 
       mockProfiles.push(newProfile);
@@ -111,7 +113,10 @@ export const loginUser = createServerFn({ method: "POST" })
     const db = await getDb();
 
     // Support quick demo logins in database-active mode
-    if (data.password === "password" && (emailLower === "sea@terrabrew.com" || emailLower === "petani@terrabrew.com")) {
+    if (
+      data.password === "password" &&
+      (emailLower === "sea@terrabrew.com" || emailLower === "petani@terrabrew.com")
+    ) {
       const isSea = emailLower === "sea@terrabrew.com";
       const profile = {
         email: emailLower,
@@ -164,14 +169,14 @@ export const loginUser = createServerFn({ method: "POST" })
           user: {
             id: isSea ? 888 : 999,
             ...profile,
-            created_at: new Date().toISOString()
-          }
+            created_at: new Date().toISOString(),
+          },
         };
       }
     }
 
     if (!db) {
-      const user = mockProfiles.find(p => p.email === emailLower);
+      const user = mockProfiles.find((p) => p.email === emailLower);
       if (!user) {
         throw new Error("User not found");
       }
@@ -223,15 +228,17 @@ export const loginUser = createServerFn({ method: "POST" })
 
 // 3. SAVE PREDICTION
 export const savePrediction = createServerFn({ method: "POST" })
-  .validator((d: {
-    farmerId: number;
-    locationName: string;
-    temperature: number;
-    humidity: number;
-    rainfall: number;
-    waterAvailability: string;
-    recommendedMethod: string;
-  }) => d)
+  .validator(
+    (d: {
+      farmerId: number;
+      locationName: string;
+      temperature: number;
+      humidity: number;
+      rainfall: number;
+      waterAvailability: string;
+      recommendedMethod: string;
+    }) => d,
+  )
   .handler(async ({ data }) => {
     const db = await getDb();
     if (!db) {
@@ -244,7 +251,7 @@ export const savePrediction = createServerFn({ method: "POST" })
         rainfall: data.rainfall,
         water_availability: data.waterAvailability,
         recommended_method: data.recommendedMethod,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       };
       mockPredictions.push(newPred);
       return { success: true, id: newPred.id };
@@ -272,8 +279,8 @@ export const getPredictionsHistory = createServerFn({ method: "GET" })
     const db = await getDb();
     if (!db) {
       return mockPredictions
-        .filter(p => p.farmer_id === data.farmerId)
-        .map(p => ({
+        .filter((p) => p.farmer_id === data.farmerId)
+        .map((p) => ({
           id: p.id,
           locationName: p.location_name,
           temperature: p.temperature,
@@ -281,7 +288,7 @@ export const getPredictionsHistory = createServerFn({ method: "GET" })
           rainfall: p.rainfall,
           waterAvailability: p.water_availability,
           recommendedMethod: p.recommended_method,
-          createdAt: p.created_at
+          createdAt: p.created_at,
         }))
         .sort((a, b) => b.id - a.id);
     }
@@ -302,48 +309,50 @@ export const getPredictionsHistory = createServerFn({ method: "GET" })
 
 // 5. SUBMIT CERTIFICATION
 export const submitCertification = createServerFn({ method: "POST" })
-  .validator((d: {
-    farmerId: number;
-    farmName: string;
-    coffeeVariety: string;
-    country?: string;
-    region?: string;
-    
-    // Raw parameters
-    envSuhu: number;
-    envRh: number;
-    envCurahHujan: number;
-    ecoPendapatan: number;
-    ecoLuasLahan: number;
-    ecoProduksi: number;
+  .validator(
+    (d: {
+      farmerId: number;
+      farmName: string;
+      coffeeVariety: string;
+      country?: string;
+      region?: string;
 
-    // Step 1
-    envKesesuaian: number;
-    envMetode: number;
-    envEnergi: number;
-    envPestisida: number;
-    envKonservasi: number;
-    envScore: number;
+      // Raw parameters
+      envSuhu: number;
+      envRh: number;
+      envCurahHujan: number;
+      ecoPendapatan: number;
+      ecoLuasLahan: number;
+      ecoProduksi: number;
 
-    // Step 2
-    ecoKualitas: number;
-    ecoPendapatanNorm: number;
-    ecoLuasLahanNorm: number;
-    ecoProduksiNorm: number;
-    ecoKredit: number;
-    ecoScore: number;
+      // Step 1
+      envKesesuaian: number;
+      envMetode: number;
+      envEnergi: number;
+      envPestisida: number;
+      envKonservasi: number;
+      envScore: number;
 
-    // Step 3
-    sosKelompok: number;
-    sosGender: number;
-    sosPendidikan: number;
-    sosHp: number;
-    sosInternet: number;
-    sosScore: number;
+      // Step 2
+      ecoKualitas: number;
+      ecoPendapatanNorm: number;
+      ecoLuasLahanNorm: number;
+      ecoProduksiNorm: number;
+      ecoKredit: number;
+      ecoScore: number;
 
-    // Step 4
-    ecoscore: number;
-  }) => d)
+      // Step 3
+      sosKelompok: number;
+      sosGender: number;
+      sosPendidikan: number;
+      sosHp: number;
+      sosInternet: number;
+      sosScore: number;
+
+      // Step 4
+      ecoscore: number;
+    }) => d,
+  )
   .handler(async ({ data }) => {
     const db = await getDb();
     if (!db) {
@@ -352,9 +361,9 @@ export const submitCertification = createServerFn({ method: "POST" })
         farmer_id: data.farmerId,
         farm_name: data.farmName,
         coffee_variety: data.coffeeVariety,
-        status: 'pending',
-        country: data.country || 'Indonesia',
-        region: data.region || 'Aceh',
+        status: "pending",
+        country: data.country || "Indonesia",
+        region: data.region || "Aceh",
         env_suhu: data.envSuhu,
         env_rh: data.envRh,
         env_curah_hujan: data.envCurahHujan,
@@ -380,7 +389,7 @@ export const submitCertification = createServerFn({ method: "POST" })
         sos_internet: data.sosInternet,
         sos_score: data.sosScore,
         ecoscore: data.ecoscore,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       };
       mockCertifications.push(newCert);
       return { success: true, id: newCert.id };
@@ -418,7 +427,7 @@ export const getFarmerCertifications = createServerFn({ method: "GET" })
     const db = await getDb();
     if (!db) {
       return mockCertifications
-        .filter(c => c.farmer_id === data.farmerId)
+        .filter((c) => c.farmer_id === data.farmerId)
         .sort((a, b) => b.id - a.id);
     }
 
@@ -439,9 +448,15 @@ export const getFarmerCertifications = createServerFn({ method: "GET" })
 
 // 7. GET ALL CERTIFICATIONS BY STATUS (For SEA)
 export const getPendingCertifications = createServerFn({ method: "GET" })
-  .validator((d: { validatorId: number; allRegions?: boolean; status?: "pending" | "approved" | "rejected" }) => d)
+  .validator(
+    (d: {
+      validatorId: number;
+      allRegions?: boolean;
+      status?: "pending" | "approved" | "rejected";
+    }) => d,
+  )
   .handler(async ({ data }) => {
-    const status = data.status || 'pending';
+    const status = data.status || "pending";
     const db = await getDb();
     if (!db) {
       // Mock validation filter (uses Aceh, Indonesia as standard mockup validator location)
@@ -449,12 +464,12 @@ export const getPendingCertifications = createServerFn({ method: "GET" })
       const valRegion = "Aceh";
 
       return mockCertifications
-        .filter(c => 
-          c.status === status && 
-          (data.allRegions || (
-            c.country?.toLowerCase() === valCountry.toLowerCase() && 
-            c.region?.toLowerCase() === valRegion.toLowerCase()
-          ))
+        .filter(
+          (c) =>
+            c.status === status &&
+            (data.allRegions ||
+              (c.country?.toLowerCase() === valCountry.toLowerCase() &&
+                c.region?.toLowerCase() === valRegion.toLowerCase())),
         )
         .sort((a, b) => a.id - b.id);
     }
@@ -477,8 +492,8 @@ export const getPendingCertifications = createServerFn({ method: "GET" })
       `;
       if (validators.length === 0) return [];
       const validator = validators[0];
-      const valCountry = validator.country || '';
-      const valRegion = validator.region || '';
+      const valCountry = validator.country || "";
+      const valRegion = validator.region || "";
 
       const rows = await db`
         SELECT c.*, f.full_name as "farmer_name", f.email as "farmer_email"
@@ -498,17 +513,19 @@ export const getPendingCertifications = createServerFn({ method: "GET" })
 
 // 8. VALIDATE CERTIFICATION (Approve/Reject)
 export const validateCertification = createServerFn({ method: "POST" })
-  .validator((d: {
-    certificationId: number;
-    validatorId: number;
-    status: "approved" | "rejected";
-    feedback: string;
-    validatorPhoto?: string;
-  }) => d)
+  .validator(
+    (d: {
+      certificationId: number;
+      validatorId: number;
+      status: "approved" | "rejected";
+      feedback: string;
+      validatorPhoto?: string;
+    }) => d,
+  )
   .handler(async ({ data }) => {
     const db = await getDb();
     if (!db) {
-      const cert = mockCertifications.find(c => c.id === data.certificationId);
+      const cert = mockCertifications.find((c) => c.id === data.certificationId);
       if (cert) {
         cert.status = data.status;
         cert.validated_by = data.validatorId;
@@ -538,27 +555,28 @@ export const validateCertification = createServerFn({ method: "POST" })
 
 // 9. CHATBOT TERRY WITH GEMINI API
 export const askTerryChatbot = createServerFn({ method: "POST" })
-  .validator((d: {
-    messages: { role: "user" | "model"; content: string }[];
-  }) => d)
+  .validator((d: { messages: { role: "user" | "model"; content: string }[] }) => d)
   .handler(async ({ data }) => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY is not configured");
     }
-    
+
     const contents = data.messages.map((m) => ({
       role: m.role === "model" ? "model" : "user",
-      parts: [{ text: m.content }]
+      parts: [{ text: m.content }],
     }));
 
     const systemInstruction = {
-      parts: [{
-        text: "You are TerraAI, a friendly, professional, and helpful AI assistant for TerraBrew. " +
-              "TerraBrew is a web platform for smart coffee post-harvest processing (recommending washed, natural, honey, wine, and semi-washed methods based on weather parameters like temperature, relative humidity, and rainfall) and specialty coffee Ecoscore certifications (evaluating environmental, economic, and social sustainability pillars on a 0.00-1.00 scale validated by the SEA). " +
-              "Keep your answers concise, engaging, and highly knowledgeable about coffee processing chemistry, fermentation, drying guidelines, and the platform's Ecoscore requirements (low < 0.33, medium 0.33-0.66, high >= 0.66). " +
-              "Help farmers optimize their post-harvest processes to increase coffee quality and guide validators in reviewing audits."
-      }]
+      parts: [
+        {
+          text:
+            "You are TerraAI, a friendly, professional, and helpful AI assistant for TerraBrew. " +
+            "TerraBrew is a web platform for smart coffee post-harvest processing (recommending washed, natural, honey, wine, and semi-washed methods based on weather parameters like temperature, relative humidity, and rainfall) and specialty coffee Ecoscore certifications (evaluating environmental, economic, and social sustainability pillars on a 0.00-1.00 scale validated by the SEA). " +
+            "Keep your answers concise, engaging, and highly knowledgeable about coffee processing chemistry, fermentation, drying guidelines, and the platform's Ecoscore requirements (low < 0.33, medium 0.33-0.66, high >= 0.66). " +
+            "Help farmers optimize their post-harvest processes to increase coffee quality and guide validators in reviewing audits.",
+        },
+      ],
     };
 
     try {
@@ -575,9 +593,9 @@ export const askTerryChatbot = createServerFn({ method: "POST" })
             generationConfig: {
               maxOutputTokens: 1000,
               temperature: 0.7,
-            }
+            },
           }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -587,7 +605,9 @@ export const askTerryChatbot = createServerFn({ method: "POST" })
       }
 
       const resData = await response.json();
-      const text = resData?.candidates?.[0]?.content?.parts?.[0]?.text || "I'm sorry, I couldn't generate a response.";
+      const text =
+        resData?.candidates?.[0]?.content?.parts?.[0]?.text ||
+        "I'm sorry, I couldn't generate a response.";
       return { success: true, text };
     } catch (error: any) {
       console.error("Ask Terry Chatbot Error:", error);
@@ -595,45 +615,45 @@ export const askTerryChatbot = createServerFn({ method: "POST" })
     }
   });
 
-export const getLiveCoffeePrice = createServerFn({ method: "GET" })
-  .handler(async () => {
-    try {
-      const res = await fetch("https://id.tradingeconomics.com/commodity/coffee", {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        }
-      });
-      const html = await res.text();
-      // Match value in TEChartsMeta
-      const match = html.match(/"value":\s*(\d+(?:\.\d+)?)/);
-      if (match) {
-        return {
-          priceCentsLbs: parseFloat(match[1]),
-          success: true
-        };
-      }
-      
-      // Fallback regex to match Indonesian text like "302,13 USd/Lbs"
-      const fallbackMatch = html.match(/Kopi\s+(?:turun|naik)\s+menjadi\s+([\d,.]+)\s+USd\/Lbs/i);
-      if (fallbackMatch) {
-        const cents = parseFloat(fallbackMatch[1].replace(",", "."));
-        return {
-          priceCentsLbs: cents,
-          success: true
-        };
-      }
-      
+export const getLiveCoffeePrice = createServerFn({ method: "GET" }).handler(async () => {
+  try {
+    const res = await fetch("https://id.tradingeconomics.com/commodity/coffee", {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
+    });
+    const html = await res.text();
+    // Match value in TEChartsMeta
+    const match = html.match(/"value":\s*(\d+(?:\.\d+)?)/);
+    if (match) {
       return {
-        priceCentsLbs: 300.0,
-        success: false,
-        msg: "Failed to parse price, using default fallback."
-      };
-    } catch (e) {
-      console.error("Error fetching coffee price:", e);
-      return {
-        priceCentsLbs: 300.0,
-        success: false,
-        msg: "Error fetching price, using default fallback."
+        priceCentsLbs: parseFloat(match[1]),
+        success: true,
       };
     }
-  });
+
+    // Fallback regex to match Indonesian text like "302,13 USd/Lbs"
+    const fallbackMatch = html.match(/Kopi\s+(?:turun|naik)\s+menjadi\s+([\d,.]+)\s+USd\/Lbs/i);
+    if (fallbackMatch) {
+      const cents = parseFloat(fallbackMatch[1].replace(",", "."));
+      return {
+        priceCentsLbs: cents,
+        success: true,
+      };
+    }
+
+    return {
+      priceCentsLbs: 300.0,
+      success: false,
+      msg: "Failed to parse price, using default fallback.",
+    };
+  } catch (e) {
+    console.error("Error fetching coffee price:", e);
+    return {
+      priceCentsLbs: 300.0,
+      success: false,
+      msg: "Error fetching price, using default fallback.",
+    };
+  }
+});

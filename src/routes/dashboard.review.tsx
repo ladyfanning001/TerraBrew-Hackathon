@@ -46,7 +46,8 @@ function ReviewPage() {
 
   const { data: pendingList, isLoading } = useQuery({
     queryKey: ["pendingCertifications", user?.id, viewMode],
-    queryFn: () => getPendingCertifications({ data: { validatorId: user!.id, allRegions: viewMode === "all" } }),
+    queryFn: () =>
+      getPendingCertifications({ data: { validatorId: user!.id, allRegions: viewMode === "all" } }),
     enabled: !!user && user.role === "sea",
   });
 
@@ -118,7 +119,10 @@ function ReviewPage() {
 
   if (!user || user.role !== "sea") {
     return (
-      <div className="flex flex-col items-center justify-center p-6 text-center space-y-4" style={{ minHeight: 400 }}>
+      <div
+        className="flex flex-col items-center justify-center p-6 text-center space-y-4"
+        style={{ minHeight: 400 }}
+      >
         <AlertCircle className="h-12 w-12 text-destructive" />
         <h3 className="text-lg font-bold text-foreground">Access Denied</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
@@ -141,7 +145,10 @@ function ReviewPage() {
 
   if (!pendingList || pendingList.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-6 text-center space-y-4" style={{ minHeight: 400 }}>
+      <div
+        className="flex flex-col items-center justify-center p-6 text-center space-y-4"
+        style={{ minHeight: 400 }}
+      >
         <AlertCircle className="h-12 w-12 text-muted-foreground" />
         <h3 className="text-lg font-bold text-foreground">No pending certifications</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
@@ -163,11 +170,15 @@ function ReviewPage() {
           </div>
           <h1 className="mt-1 text-2xl font-bold md:text-3xl text-primary">Review & Audit</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Select an application, edit feedback directly on the page, and approve or reject without a popup.
+            Select an application, edit feedback directly on the page, and approve or reject without
+            a popup.
           </p>
         </div>
         {user?.country && user?.region && (
-          <Badge variant="outline" className="border-honey/30 text-honey bg-honey/5 rounded-xl px-4 py-2 text-xs font-bold gap-1.5 shadow-sm">
+          <Badge
+            variant="outline"
+            className="border-honey/30 text-honey bg-honey/5 rounded-xl px-4 py-2 text-xs font-bold gap-1.5 shadow-sm"
+          >
             📍 {user.region}, {user.country} Jurisdiction
           </Badge>
         )}
@@ -196,16 +207,24 @@ function ReviewPage() {
         </button>
       </div>
 
-      <Card className="rounded-2xl border-border overflow-hidden" style={{ boxShadow: "var(--shadow-soft)" }}>
+      <Card
+        className="rounded-2xl border-border overflow-hidden"
+        style={{ boxShadow: "var(--shadow-soft)" }}
+      >
         <CardHeader className="border-b border-border/40 bg-secondary/10">
           <CardTitle className="flex items-center gap-2 text-primary font-bold">
             <ListFilter className="h-4 w-4" /> Pending Applications
           </CardTitle>
-          <CardDescription>Select an application below to open its editable review form.</CardDescription>
+          <CardDescription>
+            Select an application below to open its editable review form.
+          </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           <div className="grid gap-0 md:grid-cols-[340px_1fr]">
-            <div className="border-b border-border/40 md:border-b-0 md:border-r md:border-border/40 overflow-y-auto" style={{ maxHeight: 420 }}>
+            <div
+              className="border-b border-border/40 md:border-b-0 md:border-r md:border-border/40 overflow-y-auto"
+              style={{ maxHeight: 420 }}
+            >
               {pendingList.map((cert: any) => (
                 <button
                   key={cert.id}
@@ -234,87 +253,171 @@ function ReviewPage() {
 
             <div className="p-6">
               {!selectedCert ? (
-                <div className="flex items-center justify-center text-center text-muted-foreground" style={{ minHeight: 320 }}>
+                <div
+                  className="flex items-center justify-center text-center text-muted-foreground"
+                  style={{ minHeight: 320 }}
+                >
                   Select one certification application from the left to start reviewing.
                 </div>
               ) : (
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <h2 className="text-2xl font-bold text-primary">Review & Validate Certification</h2>
+                    <h2 className="text-2xl font-bold text-primary">
+                      Review & Validate Certification
+                    </h2>
                     <p className="text-sm text-muted-foreground">
-                      Farmer: <span className="font-bold text-foreground">{selectedCert.farmer_name}</span> · Farm: <span className="font-bold text-foreground">{selectedCert.farm_name}</span>
+                      Farmer:{" "}
+                      <span className="font-bold text-foreground">{selectedCert.farmer_name}</span>{" "}
+                      · Farm:{" "}
+                      <span className="font-bold text-foreground">{selectedCert.farm_name}</span>
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="text-center p-4 bg-secondary/10 rounded-xl border border-border/40">
-                      <div className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Total Ecoscore</div>
-                      <div className="text-3xl font-extrabold text-forest mt-2">{Number(selectedCert.ecoscore).toFixed(2)}</div>
+                      <div className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
+                        Total Ecoscore
+                      </div>
+                      <div className="text-3xl font-extrabold text-forest mt-2">
+                        {Number(selectedCert.ecoscore).toFixed(2)}
+                      </div>
                     </div>
                     <div className="text-center p-4 bg-green-50/50 dark:bg-green-950/20 rounded-xl border border-green-200 dark:border-green-800">
-                      <div className="text-[10px] uppercase font-bold tracking-wider text-green-600 dark:text-green-400">Environmental</div>
-                      <div className="text-2xl font-extrabold text-green-700 dark:text-green-300 mt-2">{Number(selectedCert.env_score).toFixed(2)}</div>
+                      <div className="text-[10px] uppercase font-bold tracking-wider text-green-600 dark:text-green-400">
+                        Environmental
+                      </div>
+                      <div className="text-2xl font-extrabold text-green-700 dark:text-green-300 mt-2">
+                        {Number(selectedCert.env_score).toFixed(2)}
+                      </div>
                     </div>
                     <div className="text-center p-4 bg-amber-50/50 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-800">
-                      <div className="text-[10px] uppercase font-bold tracking-wider text-amber-600 dark:text-amber-400">Economic</div>
-                      <div className="text-2xl font-extrabold text-amber-700 dark:text-amber-300 mt-2">{Number(selectedCert.eco_score).toFixed(2)}</div>
+                      <div className="text-[10px] uppercase font-bold tracking-wider text-amber-600 dark:text-amber-400">
+                        Economic
+                      </div>
+                      <div className="text-2xl font-extrabold text-amber-700 dark:text-amber-300 mt-2">
+                        {Number(selectedCert.eco_score).toFixed(2)}
+                      </div>
                     </div>
                     <div className="text-center p-4 bg-blue-50/50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800">
-                      <div className="text-[10px] uppercase font-bold tracking-wider text-blue-600 dark:text-blue-400">Social</div>
-                      <div className="text-2xl font-extrabold text-blue-700 dark:text-blue-300 mt-2">{Number(selectedCert.sos_score).toFixed(2)}</div>
+                      <div className="text-[10px] uppercase font-bold tracking-wider text-blue-600 dark:text-blue-400">
+                        Social
+                      </div>
+                      <div className="text-2xl font-extrabold text-blue-700 dark:text-blue-300 mt-2">
+                        {Number(selectedCert.sos_score).toFixed(2)}
+                      </div>
                     </div>
                   </div>
 
                   <div className="space-y-4">
-                    <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+                    <Card
+                      className="rounded-2xl border-border"
+                      style={{ boxShadow: "var(--shadow-soft)" }}
+                    >
                       <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-bold text-green-700 dark:text-green-300 flex items-center gap-2 uppercase">
-                          <Leaf className="h-4 w-4" /> Pillar 1: Environmental ({Number(selectedCert.env_score).toFixed(2)}/1.00)
+                          <Leaf className="h-4 w-4" /> Pillar 1: Environmental (
+                          {Number(selectedCert.env_score).toFixed(2)}/1.00)
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3 text-xs">
                         <div className="grid grid-cols-3 gap-2 bg-secondary/10 p-3 rounded-lg border border-border/40">
-                          <div>Temp: <span className="font-bold">{Number(selectedCert.env_suhu || 25).toFixed(1)}°C</span></div>
-                          <div>Humidity: <span className="font-bold">{Number(selectedCert.env_rh || 70).toFixed(1)}%</span></div>
-                          <div>Rainfall: <span className="font-bold">{Number(selectedCert.env_curah_hujan || 30).toFixed(1)}mm/day</span></div>
+                          <div>
+                            Temp:{" "}
+                            <span className="font-bold">
+                              {Number(selectedCert.env_suhu || 25).toFixed(1)}°C
+                            </span>
+                          </div>
+                          <div>
+                            Humidity:{" "}
+                            <span className="font-bold">
+                              {Number(selectedCert.env_rh || 70).toFixed(1)}%
+                            </span>
+                          </div>
+                          <div>
+                            Rainfall:{" "}
+                            <span className="font-bold">
+                              {Number(selectedCert.env_curah_hujan || 30).toFixed(1)}mm/day
+                            </span>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
 
-                    <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+                    <Card
+                      className="rounded-2xl border-border"
+                      style={{ boxShadow: "var(--shadow-soft)" }}
+                    >
                       <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-bold text-amber-700 dark:text-amber-300 flex items-center gap-2 uppercase">
-                          <Flame className="h-4 w-4" /> Pillar 2: Economic ({Number(selectedCert.eco_score).toFixed(2)}/1.00)
+                          <Flame className="h-4 w-4" /> Pillar 2: Economic (
+                          {Number(selectedCert.eco_score).toFixed(2)}/1.00)
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3 text-xs">
                         <div className="grid grid-cols-3 gap-2 bg-secondary/10 p-3 rounded-lg border border-border/40">
-                          <div className="col-span-3">Income: <span className="font-bold">Rp {Number(selectedCert.eco_pendapatan || 0).toLocaleString("id-ID")}/year</span></div>
-                          <div>Acreage: <span className="font-bold">{Number(selectedCert.eco_luas_lahan || 0).toFixed(1)} ha</span></div>
-                          <div>Productivity: <span className="font-bold">{Number(selectedCert.eco_produksi || 0).toFixed(1)} ton/ha/year</span></div>
+                          <div className="col-span-3">
+                            Income:{" "}
+                            <span className="font-bold">
+                              Rp {Number(selectedCert.eco_pendapatan || 0).toLocaleString("id-ID")}
+                              /year
+                            </span>
+                          </div>
+                          <div>
+                            Acreage:{" "}
+                            <span className="font-bold">
+                              {Number(selectedCert.eco_luas_lahan || 0).toFixed(1)} ha
+                            </span>
+                          </div>
+                          <div>
+                            Productivity:{" "}
+                            <span className="font-bold">
+                              {Number(selectedCert.eco_produksi || 0).toFixed(1)} ton/ha/year
+                            </span>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
 
-                    <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+                    <Card
+                      className="rounded-2xl border-border"
+                      style={{ boxShadow: "var(--shadow-soft)" }}
+                    >
                       <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-bold text-blue-700 dark:text-blue-300 flex items-center gap-2 uppercase">
-                          <ShieldCheck className="h-4 w-4" /> Pillar 3: Social ({Number(selectedCert.sos_score).toFixed(2)}/1.00)
+                          <ShieldCheck className="h-4 w-4" /> Pillar 3: Social (
+                          {Number(selectedCert.sos_score).toFixed(2)}/1.00)
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3 text-xs">
                         <div className="grid grid-cols-2 gap-3">
-                          <div>Group Participation: <span className="font-bold">{Number(selectedCert.sos_kelompok) === 1 ? "✓ Active" : "✗ Inactive"}</span></div>
-                          <div>Gender Rights: <span className="font-bold">{Number(selectedCert.sos_gender) === 1 ? "✓ Equal" : "✗ Not Equal"}</span></div>
+                          <div>
+                            Group Participation:{" "}
+                            <span className="font-bold">
+                              {Number(selectedCert.sos_kelompok) === 1 ? "✓ Active" : "✗ Inactive"}
+                            </span>
+                          </div>
+                          <div>
+                            Gender Rights:{" "}
+                            <span className="font-bold">
+                              {Number(selectedCert.sos_gender) === 1 ? "✓ Equal" : "✗ Not Equal"}
+                            </span>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
                   </div>
 
-                  <Card className="rounded-2xl border-border" style={{ boxShadow: "var(--shadow-soft)" }}>
+                  <Card
+                    className="rounded-2xl border-border"
+                    style={{ boxShadow: "var(--shadow-soft)" }}
+                  >
                     <CardHeader className="bg-secondary/20 border-b border-border/40">
-                      <CardTitle className="text-primary font-bold">SEA Validator Decision Form</CardTitle>
-                      <CardDescription>Edit the feedback directly here, then approve or reject.</CardDescription>
+                      <CardTitle className="text-primary font-bold">
+                        SEA Validator Decision Form
+                      </CardTitle>
+                      <CardDescription>
+                        Edit the feedback directly here, then approve or reject.
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6 pt-6">
                       <div className="space-y-2">
@@ -339,7 +442,11 @@ function ReviewPage() {
 
                         {photo ? (
                           <div className="relative rounded-2xl overflow-hidden border border-border/80 aspect-video max-w-sm mx-auto shadow-sm group">
-                            <img src={photo} alt="Audit proof preview" className="w-full h-full object-cover" />
+                            <img
+                              src={photo}
+                              alt="Audit proof preview"
+                              className="w-full h-full object-cover"
+                            />
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                               <Button
                                 variant="destructive"
@@ -361,8 +468,12 @@ function ReviewPage() {
                               className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                             />
                             <Camera className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                            <p className="text-xs font-bold text-foreground">Click to Take or Upload Proof Photo</p>
-                            <p className="text-[10px] text-muted-foreground mt-1">Camera will activate on mobile devices (Max 2MB)</p>
+                            <p className="text-xs font-bold text-foreground">
+                              Click to Take or Upload Proof Photo
+                            </p>
+                            <p className="text-[10px] text-muted-foreground mt-1">
+                              Camera will activate on mobile devices (Max 2MB)
+                            </p>
                           </div>
                         )}
                       </div>
@@ -370,7 +481,11 @@ function ReviewPage() {
                   </Card>
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                    <Button onClick={() => navigate({ to: "/dashboard/validate" })} variant="outline" className="text-muted-foreground hover:text-foreground">
+                    <Button
+                      onClick={() => navigate({ to: "/dashboard/validate" })}
+                      variant="outline"
+                      className="text-muted-foreground hover:text-foreground"
+                    >
                       <ArrowLeft className="mr-2 h-4 w-4" /> Back to Validation Portal
                     </Button>
                     <div className="flex gap-2 ml-auto">

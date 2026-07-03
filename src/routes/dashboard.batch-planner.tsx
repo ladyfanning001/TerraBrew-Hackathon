@@ -40,7 +40,8 @@ export const Route = createFileRoute("/dashboard/batch-planner")({
       { title: "Batch Planner & Prices (Pro) — TerraBrew" },
       {
         name: "description",
-        content: "Interactive Batch Planner and Revenue Predictor incorporating live commodities indexes.",
+        content:
+          "Interactive Batch Planner and Revenue Predictor incorporating live commodities indexes.",
       },
     ],
   }),
@@ -69,7 +70,9 @@ function BatchPlannerPage() {
   const [calculatedWine, setCalculatedWine] = useState(0);
   const [calculatedNatural, setCalculatedNatural] = useState(0);
 
-  const [livePrice, setLivePrice] = useState<{ priceCentsLbs: number; success: boolean } | null>(null);
+  const [livePrice, setLivePrice] = useState<{ priceCentsLbs: number; success: boolean } | null>(
+    null,
+  );
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
 
   useEffect(() => {
@@ -89,7 +92,13 @@ function BatchPlannerPage() {
 
   // Batch allocation planner calculations
   const totalAllocation = useMemo(() => {
-    return Number(washedSplit) + Number(semiWashedSplit) + Number(honeySplit) + Number(wineSplit) + Number(naturalSplit);
+    return (
+      Number(washedSplit) +
+      Number(semiWashedSplit) +
+      Number(honeySplit) +
+      Number(wineSplit) +
+      Number(naturalSplit)
+    );
   }, [washedSplit, semiWashedSplit, honeySplit, wineSplit, naturalSplit]);
 
   const priceCentsLbs = livePrice?.priceCentsLbs || 302.13;
@@ -100,8 +109,8 @@ function BatchPlannerPage() {
   const multipliers = {
     washed: 1.0,
     semi_washed: 1.05,
-    honey: 1.20,
-    wine: 1.50,
+    honey: 1.2,
+    wine: 1.5,
     natural: 1.15,
   };
 
@@ -123,8 +132,13 @@ function BatchPlannerPage() {
 
   const plannerMetrics = useMemo(() => {
     const weight = calculatedWeight || 0;
-    const totalCalcAllocation = calculatedWashed + calculatedSemiWashed + calculatedHoney + calculatedWine + calculatedNatural;
-    const factor = totalCalcAllocation > 0 ? (weight / 100) : 0;
+    const totalCalcAllocation =
+      calculatedWashed +
+      calculatedSemiWashed +
+      calculatedHoney +
+      calculatedWine +
+      calculatedNatural;
+    const factor = totalCalcAllocation > 0 ? weight / 100 : 0;
 
     const allocations = {
       washed: calculatedWashed * factor,
@@ -174,16 +188,16 @@ function BatchPlannerPage() {
     const baselineWater = weight * waterLitersPerKg.washed;
     const waterSavings = Math.max(0, baselineWater - totalWater);
 
-    const avgSustainabilityScore = weight > 0
-      ? (
-          (allocations.washed * ecoScores.washed +
-           allocations.semi_washed * ecoScores.semi_washed +
-           allocations.honey * ecoScores.honey +
-           allocations.wine * ecoScores.wine +
-           allocations.natural * ecoScores.natural) /
-          weight
-        ) / 100
-      : 0;
+    const avgSustainabilityScore =
+      weight > 0
+        ? (allocations.washed * ecoScores.washed +
+            allocations.semi_washed * ecoScores.semi_washed +
+            allocations.honey * ecoScores.honey +
+            allocations.wine * ecoScores.wine +
+            allocations.natural * ecoScores.natural) /
+          weight /
+          100
+        : 0;
 
     return {
       allocations,
@@ -198,20 +212,30 @@ function BatchPlannerPage() {
       waterSavings,
       avgSustainabilityScore,
     };
-  }, [calculatedWeight, calculatedWashed, calculatedSemiWashed, calculatedHoney, calculatedWine, calculatedNatural, basePriceUsdKg]);
+  }, [
+    calculatedWeight,
+    calculatedWashed,
+    calculatedSemiWashed,
+    calculatedHoney,
+    calculatedWine,
+    calculatedNatural,
+    basePriceUsdKg,
+  ]);
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 text-foreground bg-background">
       {/* HEADER SECTION */}
       <div>
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-forest/10 text-forest border border-forest/20">
-          <Sparkles className="h-3.5 w-3.5 animate-spin" style={{ animationDuration: '4s' }} /> TerraBrew smart engine (Pro)
+          <Sparkles className="h-3.5 w-3.5 animate-spin" style={{ animationDuration: "4s" }} />{" "}
+          TerraBrew smart engine (Pro)
         </div>
         <h1 className="mt-1 text-2xl font-bold tracking-tight md:text-3xl text-primary">
           Interactive Batch Planner & Revenue Predictor
         </h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Plan your post-harvest splits, view dynamic water footprint stats, and calculate revenue projections using real-time coffee market feeds.
+          Plan your post-harvest splits, view dynamic water footprint stats, and calculate revenue
+          projections using real-time coffee market feeds.
         </p>
       </div>
 
@@ -226,15 +250,21 @@ function BatchPlannerPage() {
                 Harvest & Process Splits
               </CardTitle>
               <CardDescription>
-                Define your coffee cherry harvest quantity and distribute it among different processing methods.
+                Define your coffee cherry harvest quantity and distribute it among different
+                processing methods.
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
               {/* Harvest quantity input */}
               <div className="space-y-2">
-                <Label htmlFor="harvest-weight" className="text-xs font-bold text-foreground flex justify-between">
+                <Label
+                  htmlFor="harvest-weight"
+                  className="text-xs font-bold text-foreground flex justify-between"
+                >
                   <span>TOTAL HARVEST QUANTITY (kg of Cherries)</span>
-                  <span className="text-accent font-bold">{totalCherryWeight.toLocaleString()} kg</span>
+                  <span className="text-accent font-bold">
+                    {totalCherryWeight.toLocaleString()} kg
+                  </span>
                 </Label>
                 <div className="flex items-center gap-4 py-2">
                   <Slider
@@ -257,7 +287,8 @@ function BatchPlannerPage() {
                   />
                 </div>
                 <p className="text-[10px] text-muted-foreground leading-relaxed">
-                  Decoupled Slider: Drag to adjust volume smoothly. Values and projections only update upon slider release.
+                  Decoupled Slider: Drag to adjust volume smoothly. Values and projections only
+                  update upon slider release.
                 </p>
               </div>
 
@@ -283,7 +314,9 @@ function BatchPlannerPage() {
                       min={0}
                       max={100}
                       value={washedSplit}
-                      onChange={(e) => setWashedSplit(Math.max(0, Math.min(100, Number(e.target.value))))}
+                      onChange={(e) =>
+                        setWashedSplit(Math.max(0, Math.min(100, Number(e.target.value))))
+                      }
                       className="w-16 h-8 text-right bg-background border-border/80 rounded-lg text-xs font-semibold font-mono"
                     />
                     <span className="text-[10px] text-muted-foreground">%</span>
@@ -306,7 +339,9 @@ function BatchPlannerPage() {
                       min={0}
                       max={100}
                       value={semiWashedSplit}
-                      onChange={(e) => setSemiWashedSplit(Math.max(0, Math.min(100, Number(e.target.value))))}
+                      onChange={(e) =>
+                        setSemiWashedSplit(Math.max(0, Math.min(100, Number(e.target.value))))
+                      }
                       className="w-16 h-8 text-right bg-background border-border/80 rounded-lg text-xs font-semibold font-mono"
                     />
                     <span className="text-[10px] text-muted-foreground">%</span>
@@ -329,7 +364,9 @@ function BatchPlannerPage() {
                       min={0}
                       max={100}
                       value={honeySplit}
-                      onChange={(e) => setHoneySplit(Math.max(0, Math.min(100, Number(e.target.value))))}
+                      onChange={(e) =>
+                        setHoneySplit(Math.max(0, Math.min(100, Number(e.target.value))))
+                      }
                       className="w-16 h-8 text-right bg-background border-border/80 rounded-lg text-xs font-semibold font-mono"
                     />
                     <span className="text-[10px] text-muted-foreground">%</span>
@@ -352,7 +389,9 @@ function BatchPlannerPage() {
                       min={0}
                       max={100}
                       value={wineSplit}
-                      onChange={(e) => setWineSplit(Math.max(0, Math.min(100, Number(e.target.value))))}
+                      onChange={(e) =>
+                        setWineSplit(Math.max(0, Math.min(100, Number(e.target.value))))
+                      }
                       className="w-16 h-8 text-right bg-background border-border/80 rounded-lg text-xs font-semibold font-mono"
                     />
                     <span className="text-[10px] text-muted-foreground">%</span>
@@ -375,7 +414,9 @@ function BatchPlannerPage() {
                       min={0}
                       max={100}
                       value={naturalSplit}
-                      onChange={(e) => setNaturalSplit(Math.max(0, Math.min(100, Number(e.target.value))))}
+                      onChange={(e) =>
+                        setNaturalSplit(Math.max(0, Math.min(100, Number(e.target.value))))
+                      }
                       className="w-16 h-8 text-right bg-background border-border/80 rounded-lg text-xs font-semibold font-mono"
                     />
                     <span className="text-[10px] text-muted-foreground">%</span>
@@ -390,11 +431,43 @@ function BatchPlannerPage() {
                   <span>Total: {totalAllocation}%</span>
                 </div>
                 <div className="h-4 w-full rounded-full overflow-hidden flex bg-secondary/30 border border-border/30">
-                  {washedSplit > 0 && <div className="bg-[#4682b4] transition-all" style={{ width: `${(washedSplit / Math.max(1, totalAllocation)) * 100}%` }} title={`Washed: ${washedSplit}%`} />}
-                  {semiWashedSplit > 0 && <div className="bg-[#27432b] transition-all" style={{ width: `${(semiWashedSplit / Math.max(1, totalAllocation)) * 100}%` }} title={`Semi-Washed: ${semiWashedSplit}%`} />}
-                  {honeySplit > 0 && <div className="bg-[#d88f34] transition-all" style={{ width: `${(honeySplit / Math.max(1, totalAllocation)) * 100}%` }} title={`Honey: ${honeySplit}%`} />}
-                  {wineSplit > 0 && <div className="bg-[#b22222] transition-all" style={{ width: `${(wineSplit / Math.max(1, totalAllocation)) * 100}%` }} title={`Wine: ${wineSplit}%`} />}
-                  {naturalSplit > 0 && <div className="bg-[#42302c] transition-all" style={{ width: `${(naturalSplit / Math.max(1, totalAllocation)) * 100}%` }} title={`Natural: ${naturalSplit}%`} />}
+                  {washedSplit > 0 && (
+                    <div
+                      className="bg-[#4682b4] transition-all"
+                      style={{ width: `${(washedSplit / Math.max(1, totalAllocation)) * 100}%` }}
+                      title={`Washed: ${washedSplit}%`}
+                    />
+                  )}
+                  {semiWashedSplit > 0 && (
+                    <div
+                      className="bg-[#27432b] transition-all"
+                      style={{
+                        width: `${(semiWashedSplit / Math.max(1, totalAllocation)) * 100}%`,
+                      }}
+                      title={`Semi-Washed: ${semiWashedSplit}%`}
+                    />
+                  )}
+                  {honeySplit > 0 && (
+                    <div
+                      className="bg-[#d88f34] transition-all"
+                      style={{ width: `${(honeySplit / Math.max(1, totalAllocation)) * 100}%` }}
+                      title={`Honey: ${honeySplit}%`}
+                    />
+                  )}
+                  {wineSplit > 0 && (
+                    <div
+                      className="bg-[#b22222] transition-all"
+                      style={{ width: `${(wineSplit / Math.max(1, totalAllocation)) * 100}%` }}
+                      title={`Wine: ${wineSplit}%`}
+                    />
+                  )}
+                  {naturalSplit > 0 && (
+                    <div
+                      className="bg-[#42302c] transition-all"
+                      style={{ width: `${(naturalSplit / Math.max(1, totalAllocation)) * 100}%` }}
+                      title={`Natural: ${naturalSplit}%`}
+                    />
+                  )}
                 </div>
               </div>
 
@@ -403,14 +476,18 @@ function BatchPlannerPage() {
                 <div className="p-4 border border-destructive/20 bg-destructive/5 text-destructive rounded-xl text-xs flex gap-2 items-start leading-relaxed animate-pulse">
                   <AlertTriangle className="h-4.5 w-4.5 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold">Invalid splits total!</span> The current allocation sums to <strong>{totalAllocation}%</strong>. Please adjust the splits to total exactly <strong>100%</strong> to ensure valid resource & revenue projections.
+                    <span className="font-bold">Invalid splits total!</span> The current allocation
+                    sums to <strong>{totalAllocation}%</strong>. Please adjust the splits to total
+                    exactly <strong>100%</strong> to ensure valid resource & revenue projections.
                   </div>
                 </div>
               ) : (
                 <div className="p-4 border border-accent/20 bg-accent/5 text-accent rounded-xl text-xs flex gap-2 items-start leading-relaxed">
                   <CheckCircle2 className="h-4.5 w-4.5 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold">Perfect distribution!</span> Your splits sum to exactly <strong>100%</strong>. Click the button below to process and compute outcomes.
+                    <span className="font-bold">Perfect distribution!</span> Your splits sum to
+                    exactly <strong>100%</strong>. Click the button below to process and compute
+                    outcomes.
                   </div>
                 </div>
               )}
@@ -446,7 +523,10 @@ function BatchPlannerPage() {
               </div>
               <h3 className="font-bold text-lg text-primary">Awaiting Process Allocation</h3>
               <p className="text-sm text-muted-foreground max-w-sm mt-2">
-                Please configure your total harvest volume and process percentage splits on the left. Ensure they total exactly 100%, then click the <strong>Process Batch Allocation</strong> button to view economic & resource projections.
+                Please configure your total harvest volume and process percentage splits on the
+                left. Ensure they total exactly 100%, then click the{" "}
+                <strong>Process Batch Allocation</strong> button to view economic & resource
+                projections.
               </p>
             </Card>
           ) : (
@@ -459,25 +539,37 @@ function BatchPlannerPage() {
                       <Globe className="h-5 w-5 animate-pulse" />
                     </div>
                     <div>
-                      <div className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">TradingEconomics Live Commodity Price</div>
+                      <div className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
+                        TradingEconomics Live Commodity Price
+                      </div>
                       <div className="text-lg font-bold text-primary flex items-baseline gap-1.5 mt-0.5 font-mono">
-                        ${(priceCentsLbs / 100).toFixed(2)} <span className="text-xs text-muted-foreground font-normal">/ Lbs (pound)</span>
+                        ${(priceCentsLbs / 100).toFixed(2)}{" "}
+                        <span className="text-xs text-muted-foreground font-normal">
+                          / Lbs (pound)
+                        </span>
                       </div>
                     </div>
                   </div>
-                  <Badge variant="secondary" className="bg-forest/15 text-forest border-transparent py-1 text-xs">
+                  <Badge
+                    variant="secondary"
+                    className="bg-forest/15 text-forest border-transparent py-1 text-xs"
+                  >
                     🟢 Live Coffee feed OK
                   </Badge>
                 </div>
                 <CardContent className="p-5 grid gap-4 sm:grid-cols-2 text-xs">
                   <div className="p-3 bg-secondary/10 rounded-xl border border-border/30">
-                    <span className="text-muted-foreground block font-bold">Converted Price / kg (Green Coffee):</span>
+                    <span className="text-muted-foreground block font-bold">
+                      Converted Price / kg (Green Coffee):
+                    </span>
                     <span className="text-sm font-bold text-foreground mt-1 block font-mono">
                       ${basePriceUsdKg.toFixed(2)} USD
                     </span>
                   </div>
                   <div className="p-3 bg-secondary/10 rounded-xl border border-border/30">
-                    <span className="text-muted-foreground block font-bold">Local Price / kg (IDR Reference):</span>
+                    <span className="text-muted-foreground block font-bold">
+                      Local Price / kg (IDR Reference):
+                    </span>
                     <span className="text-sm font-bold text-accent mt-1 block font-mono">
                       Rp {(basePriceUsdKg * usdToIdrRate).toLocaleString("id-ID")} IDR
                     </span>
@@ -493,7 +585,9 @@ function BatchPlannerPage() {
                     <div className="p-2 rounded-xl bg-forest/10 text-forest w-fit">
                       <Coffee className="h-4.5 w-4.5" />
                     </div>
-                    <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mt-3">Green Coffee Yield</div>
+                    <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mt-3">
+                      Green Coffee Yield
+                    </div>
                   </div>
                   <div className="mt-2">
                     <div className="text-xl font-bold font-mono text-primary">
@@ -511,7 +605,9 @@ function BatchPlannerPage() {
                     <div className="p-2 rounded-xl bg-accent/10 text-accent w-fit">
                       <TrendingUp className="h-4.5 w-4.5" />
                     </div>
-                    <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mt-3">Projected Revenue</div>
+                    <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mt-3">
+                      Projected Revenue
+                    </div>
                   </div>
                   <div className="mt-2">
                     <div className="text-xl font-bold font-mono text-forest">
@@ -529,7 +625,9 @@ function BatchPlannerPage() {
                     <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500 w-fit">
                       <Droplets className="h-4.5 w-4.5" />
                     </div>
-                    <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mt-3">Total Water Used</div>
+                    <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mt-3">
+                      Total Water Used
+                    </div>
                   </div>
                   <div className="mt-2">
                     <div className="text-xl font-bold font-mono text-blue-600">
@@ -547,39 +645,55 @@ function BatchPlannerPage() {
                     <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500 w-fit">
                       <Award className="h-4.5 w-4.5" />
                     </div>
-                    <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mt-3">Sustainability Score</div>
+                    <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mt-3">
+                      Sustainability Score
+                    </div>
                   </div>
                   <div className="mt-2">
                     <div className="text-xl font-bold font-mono text-emerald-600">
                       {Math.round(plannerMetrics.avgSustainabilityScore * 100)} / 100
                     </div>
                     <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight font-bold">
-                      💧 Saved {Math.round(plannerMetrics.waterSavings).toLocaleString()} L vs Washed
+                      💧 Saved {Math.round(plannerMetrics.waterSavings).toLocaleString()} L vs
+                      Washed
                     </p>
                   </div>
                 </Card>
               </div>
 
               {/* Recharts Charts Card */}
-              {(calculatedWashed + calculatedSemiWashed + calculatedHoney + calculatedWine + calculatedNatural) > 0 && (
+              {calculatedWashed +
+                calculatedSemiWashed +
+                calculatedHoney +
+                calculatedWine +
+                calculatedNatural >
+                0 && (
                 <Card className="rounded-2xl border-border shadow-[var(--shadow-soft)] bg-card overflow-hidden">
                   <CardHeader>
-                    <CardTitle className="text-primary font-bold text-sm">Batch Allocations & Impact Visualizations</CardTitle>
+                    <CardTitle className="text-primary font-bold text-sm">
+                      Batch Allocations & Impact Visualizations
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="grid gap-6 md:grid-cols-2 p-6">
                     {/* Pie Chart */}
                     <div className="h-64 flex flex-col justify-center items-center">
-                      <div className="text-xs font-semibold text-muted-foreground mb-1">Harvest Distribution (%)</div>
+                      <div className="text-xs font-semibold text-muted-foreground mb-1">
+                        Harvest Distribution (%)
+                      </div>
                       <ResponsiveContainer width="100%" height="90%">
                         <PieChart>
                           <Pie
                             data={[
                               { name: "Washed", value: calculatedWashed, color: "#4682b4" },
-                              { name: "Semi-Washed", value: calculatedSemiWashed, color: "#27432b" },
+                              {
+                                name: "Semi-Washed",
+                                value: calculatedSemiWashed,
+                                color: "#27432b",
+                              },
                               { name: "Honey", value: calculatedHoney, color: "#d88f34" },
                               { name: "Wine", value: calculatedWine, color: "#b22222" },
                               { name: "Natural", value: calculatedNatural, color: "#42302c" },
-                            ].filter(d => d.value > 0)}
+                            ].filter((d) => d.value > 0)}
                             cx="50%"
                             cy="50%"
                             innerRadius={60}
@@ -589,15 +703,28 @@ function BatchPlannerPage() {
                           >
                             {[
                               { name: "Washed", value: calculatedWashed, color: "#4682b4" },
-                              { name: "Semi-Washed", value: calculatedSemiWashed, color: "#27432b" },
+                              {
+                                name: "Semi-Washed",
+                                value: calculatedSemiWashed,
+                                color: "#27432b",
+                              },
                               { name: "Honey", value: calculatedHoney, color: "#d88f34" },
                               { name: "Wine", value: calculatedWine, color: "#b22222" },
                               { name: "Natural", value: calculatedNatural, color: "#42302c" },
-                            ].filter(d => d.value > 0).map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
+                            ]
+                              .filter((d) => d.value > 0)
+                              .map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
                           </Pie>
-                          <RTooltip formatter={(val) => `${val}%`} contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12 }} />
+                          <RTooltip
+                            formatter={(val) => `${val}%`}
+                            contentStyle={{
+                              background: "var(--card)",
+                              border: "1px solid var(--border)",
+                              borderRadius: 12,
+                            }}
+                          />
                         </PieChart>
                       </ResponsiveContainer>
                       <div className="flex flex-wrap gap-2 justify-center mt-2 text-[10px] font-semibold text-muted-foreground">
@@ -607,49 +734,82 @@ function BatchPlannerPage() {
                           { name: "Honey", value: calculatedHoney, color: "#d88f34" },
                           { name: "Wine", value: calculatedWine, color: "#b22222" },
                           { name: "Natural", value: calculatedNatural, color: "#42302c" },
-                        ].filter(d => d.value > 0).map(d => (
-                          <span key={d.name} className="flex items-center gap-1">
-                            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: d.color }} /> {d.name}
-                          </span>
-                        ))}
+                        ]
+                          .filter((d) => d.value > 0)
+                          .map((d) => (
+                            <span key={d.name} className="flex items-center gap-1">
+                              <span
+                                className="h-2 w-2 rounded-full"
+                                style={{ backgroundColor: d.color }}
+                              />{" "}
+                              {d.name}
+                            </span>
+                          ))}
                       </div>
                     </div>
 
                     {/* Bar Chart */}
                     <div className="h-64 flex flex-col justify-center">
-                      <div className="text-xs font-semibold text-center text-muted-foreground mb-1 font-bold">Water Use (L) vs Revenue (USD)</div>
+                      <div className="text-xs font-semibold text-center text-muted-foreground mb-1 font-bold">
+                        Water Use (L) vs Revenue (USD)
+                      </div>
                       <ResponsiveContainer width="100%" height="90%">
-                        <BarChart data={[
-                          {
-                            name: "Washed",
-                            "Water (L)": Math.round(plannerMetrics.waterUsages.washed),
-                            "Rev (USD)": Math.round(plannerMetrics.revenuesUsd.washed),
-                          },
-                          {
-                            name: "Semi-Washed",
-                            "Water (L)": Math.round(plannerMetrics.waterUsages.semi_washed),
-                            "Rev (USD)": Math.round(plannerMetrics.revenuesUsd.semi_washed),
-                          },
-                          {
-                            name: "Honey",
-                            "Water (L)": Math.round(plannerMetrics.waterUsages.honey),
-                            "Rev (USD)": Math.round(plannerMetrics.revenuesUsd.honey),
-                          },
-                          {
-                            name: "Wine",
-                            "Water (L)": Math.round(plannerMetrics.waterUsages.wine),
-                            "Rev (USD)": Math.round(plannerMetrics.revenuesUsd.wine),
-                          },
-                          {
-                            name: "Natural",
-                            "Water (L)": Math.round(plannerMetrics.waterUsages.natural),
-                            "Rev (USD)": Math.round(plannerMetrics.revenuesUsd.natural),
-                          },
-                        ]}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                          <XAxis dataKey="name" tick={{ fill: "var(--muted-foreground)", fontSize: 9, fontWeight: "600" }} axisLine={false} tickLine={false} />
-                          <YAxis tick={{ fill: "var(--muted-foreground)", fontSize: 9 }} axisLine={false} tickLine={false} />
-                          <RTooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12 }} />
+                        <BarChart
+                          data={[
+                            {
+                              name: "Washed",
+                              "Water (L)": Math.round(plannerMetrics.waterUsages.washed),
+                              "Rev (USD)": Math.round(plannerMetrics.revenuesUsd.washed),
+                            },
+                            {
+                              name: "Semi-Washed",
+                              "Water (L)": Math.round(plannerMetrics.waterUsages.semi_washed),
+                              "Rev (USD)": Math.round(plannerMetrics.revenuesUsd.semi_washed),
+                            },
+                            {
+                              name: "Honey",
+                              "Water (L)": Math.round(plannerMetrics.waterUsages.honey),
+                              "Rev (USD)": Math.round(plannerMetrics.revenuesUsd.honey),
+                            },
+                            {
+                              name: "Wine",
+                              "Water (L)": Math.round(plannerMetrics.waterUsages.wine),
+                              "Rev (USD)": Math.round(plannerMetrics.revenuesUsd.wine),
+                            },
+                            {
+                              name: "Natural",
+                              "Water (L)": Math.round(plannerMetrics.waterUsages.natural),
+                              "Rev (USD)": Math.round(plannerMetrics.revenuesUsd.natural),
+                            },
+                          ]}
+                        >
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            stroke="var(--border)"
+                            vertical={false}
+                          />
+                          <XAxis
+                            dataKey="name"
+                            tick={{
+                              fill: "var(--muted-foreground)",
+                              fontSize: 9,
+                              fontWeight: "600",
+                            }}
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                          <YAxis
+                            tick={{ fill: "var(--muted-foreground)", fontSize: 9 }}
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                          <RTooltip
+                            contentStyle={{
+                              background: "var(--card)",
+                              border: "1px solid var(--border)",
+                              borderRadius: 12,
+                            }}
+                          />
                           <Legend wrapperStyle={{ fontSize: 9, fontWeight: 600 }} />
                           <Bar dataKey="Water (L)" fill="var(--chart-4)" radius={[4, 4, 0, 0]} />
                           <Bar dataKey="Rev (USD)" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />

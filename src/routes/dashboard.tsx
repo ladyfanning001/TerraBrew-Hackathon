@@ -33,11 +33,19 @@ function DashboardLayout() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-background text-foreground" style={{ background: "var(--gradient-hero)" }}>
-        <div className="flex h-14 w-14 items-center justify-center rounded-3xl text-cream animate-bounce mb-4" style={{ background: "var(--gradient-eco)" }}>
-          <Coffee className="h-8 w-8 animate-spin" style={{ animationDuration: '3s' }} />
+      <div
+        className="flex min-h-screen flex-col items-center justify-center bg-background text-foreground"
+        style={{ background: "var(--gradient-hero)" }}
+      >
+        <div
+          className="flex h-14 w-14 items-center justify-center rounded-3xl text-cream animate-bounce mb-4"
+          style={{ background: "var(--gradient-eco)" }}
+        >
+          <Coffee className="h-8 w-8 animate-spin" style={{ animationDuration: "3s" }} />
         </div>
-        <div className="text-sm font-bold tracking-tight text-primary animate-pulse">Loading TerraBrew Session...</div>
+        <div className="text-sm font-bold tracking-tight text-primary animate-pulse">
+          Loading TerraBrew Session...
+        </div>
       </div>
     );
   }

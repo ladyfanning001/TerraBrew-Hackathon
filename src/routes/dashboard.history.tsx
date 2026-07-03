@@ -8,20 +8,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 
 // Server function to fetch history logs from PostgreSQL
-const getRecommendationHistoryFn = createServerFn({ method: "GET" })
-  .handler(async () => {
-    try {
-      const results = await db
-        .select()
-        .from(recommendationHistory)
-        .orderBy(desc(recommendationHistory.createdAt))
-        .limit(20);
-      return results;
-    } catch (e) {
-      console.error("Failed to query history from PostgreSQL database:", e);
-      return [];
-    }
-  });
+const getRecommendationHistoryFn = createServerFn({ method: "GET" }).handler(async () => {
+  try {
+    const results = await db
+      .select()
+      .from(recommendationHistory)
+      .orderBy(desc(recommendationHistory.createdAt))
+      .limit(20);
+    return results;
+  } catch (e) {
+    console.error("Failed to query history from PostgreSQL database:", e);
+    return [];
+  }
+});
 
 export const Route = createFileRoute("/dashboard/history")({
   loader: async () => {
@@ -31,7 +30,10 @@ export const Route = createFileRoute("/dashboard/history")({
   head: () => ({
     meta: [
       { title: "Processing History — TerraBrew" },
-      { name: "description", content: "Past recommendations, environmental conditions, and chosen processing methods." },
+      {
+        name: "description",
+        content: "Past recommendations, environmental conditions, and chosen processing methods.",
+      },
     ],
   }),
   component: HistoryPage,
@@ -47,11 +49,56 @@ const colorMap: Record<string, string> = {
 };
 
 const defaultRows = [
-  { id: 99, location: "Medellín, Antioquia (Colombia)", rainfall: 12, temperature: 23, humidity: 70, score: 85, recommendedMethod: "honey", createdAt: new Date("2026-05-09T08:00:00Z").toISOString() },
-  { id: 98, location: "Aceh Gayo (Indonesia)", rainfall: 48, temperature: 22, humidity: 84, score: 55, recommendedMethod: "washed", createdAt: new Date("2026-05-06T10:30:00Z").toISOString() },
-  { id: 97, location: "Kintamani, Bali", rainfall: 4, temperature: 26, humidity: 62, score: 95, recommendedMethod: "natural", createdAt: new Date("2026-05-03T15:00:00Z").toISOString() },
-  { id: 96, location: "Wamena, Papua", rainfall: 22, temperature: 24, humidity: 75, score: 75, recommendedMethod: "semi_washed", createdAt: new Date("2026-04-29T09:15:00Z").toISOString() },
-  { id: 95, location: "Nyeri Highlands (Kenya)", rainfall: 8, temperature: 25, humidity: 55, score: 90, recommendedMethod: "wine", createdAt: new Date("2026-04-25T11:00:00Z").toISOString() },
+  {
+    id: 99,
+    location: "Medellín, Antioquia (Colombia)",
+    rainfall: 12,
+    temperature: 23,
+    humidity: 70,
+    score: 85,
+    recommendedMethod: "honey",
+    createdAt: new Date("2026-05-09T08:00:00Z").toISOString(),
+  },
+  {
+    id: 98,
+    location: "Aceh Gayo (Indonesia)",
+    rainfall: 48,
+    temperature: 22,
+    humidity: 84,
+    score: 55,
+    recommendedMethod: "washed",
+    createdAt: new Date("2026-05-06T10:30:00Z").toISOString(),
+  },
+  {
+    id: 97,
+    location: "Kintamani, Bali",
+    rainfall: 4,
+    temperature: 26,
+    humidity: 62,
+    score: 95,
+    recommendedMethod: "natural",
+    createdAt: new Date("2026-05-03T15:00:00Z").toISOString(),
+  },
+  {
+    id: 96,
+    location: "Wamena, Papua",
+    rainfall: 22,
+    temperature: 24,
+    humidity: 75,
+    score: 75,
+    recommendedMethod: "semi_washed",
+    createdAt: new Date("2026-04-29T09:15:00Z").toISOString(),
+  },
+  {
+    id: 95,
+    location: "Nyeri Highlands (Kenya)",
+    rainfall: 8,
+    temperature: 25,
+    humidity: 55,
+    score: 90,
+    recommendedMethod: "wine",
+    createdAt: new Date("2026-04-25T11:00:00Z").toISOString(),
+  },
 ];
 
 function HistoryPage() {
@@ -61,7 +108,7 @@ function HistoryPage() {
   const isDemo = historyData.length === 0;
   const rows = isDemo ? defaultRows : historyData;
 
-  const formatDate = (isoString: string) => {
+  const formatDate = (isoString: string | Date) => {
     return new Date(isoString).toLocaleDateString("en-US", {
       month: "short",
       day: "2-digit",
@@ -78,8 +125,12 @@ function HistoryPage() {
         <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground font-semibold">
           <History className="h-3 w-3 text-forest animate-pulse" /> Processing History
         </div>
-        <h1 className="mt-1 text-2xl font-bold md:text-3xl text-primary font-bold">Your past harvests</h1>
-        <p className="text-sm text-muted-foreground">A live log of TerraBrew recommendations queried directly from PostgreSQL.</p>
+        <h1 className="mt-1 text-2xl font-bold md:text-3xl text-primary font-bold">
+          Your past harvests
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          A live log of TerraBrew recommendations queried directly from PostgreSQL.
+        </p>
       </div>
 
       {/* Connection Indicator Badge */}
@@ -88,7 +139,8 @@ function HistoryPage() {
           <div className="flex gap-2 items-center">
             <Database className="h-4 w-4 text-accent shrink-0" />
             <span className="font-semibold text-muted-foreground">
-              Status: {isDemo ? (
+              Status:{" "}
+              {isDemo ? (
                 <span className="text-amber-600 font-bold">Database Empty (Showing Demo Logs)</span>
               ) : (
                 <span className="text-forest font-bold">Active PostgreSQL Connection Live</span>
@@ -96,7 +148,10 @@ function HistoryPage() {
             </span>
           </div>
           {!isDemo && (
-            <Badge variant="secondary" className="bg-forest/15 text-forest border-transparent py-0.5">
+            <Badge
+              variant="secondary"
+              className="bg-forest/15 text-forest border-transparent py-0.5"
+            >
               Synced: {historyData.length} records loaded
             </Badge>
           )}
@@ -117,10 +172,18 @@ function HistoryPage() {
                   <th className="py-3">Timestamp</th>
                   <th className="py-3">Location</th>
                   <th className="py-3">Method</th>
-                  <th className="py-3"><CloudRain className="inline h-3.5 w-3.5 mr-1" /> Rain</th>
-                  <th className="py-3"><Thermometer className="inline h-3.5 w-3.5 mr-1" /> Temp</th>
-                  <th className="py-3"><Droplets className="inline h-3.5 w-3.5 mr-1" /> Humidity</th>
-                  <th className="py-3"><Leaf className="inline h-3.5 w-3.5 mr-1" /> Match Score</th>
+                  <th className="py-3">
+                    <CloudRain className="inline h-3.5 w-3.5 mr-1" /> Rain
+                  </th>
+                  <th className="py-3">
+                    <Thermometer className="inline h-3.5 w-3.5 mr-1" /> Temp
+                  </th>
+                  <th className="py-3">
+                    <Droplets className="inline h-3.5 w-3.5 mr-1" /> Humidity
+                  </th>
+                  <th className="py-3">
+                    <Leaf className="inline h-3.5 w-3.5 mr-1" /> Match Score
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -131,12 +194,25 @@ function HistoryPage() {
                     .replace(/\b\w/g, (c) => c.toUpperCase());
 
                   return (
-                    <tr key={r.id} className="border-t border-border/60 hover:bg-secondary/10 transition-colors">
-                      <td className="py-4 font-semibold text-muted-foreground text-xs">{formatDate(r.createdAt)}</td>
-                      <td className="py-4 font-bold text-foreground max-w-[200px] truncate" title={r.location}>{r.location}</td>
+                    <tr
+                      key={r.id}
+                      className="border-t border-border/60 hover:bg-secondary/10 transition-colors"
+                    >
+                      <td className="py-4 font-semibold text-muted-foreground text-xs">
+                        {formatDate(r.createdAt)}
+                      </td>
+                      <td
+                        className="py-4 font-bold text-foreground max-w-[200px] truncate"
+                        title={r.location}
+                      >
+                        {r.location}
+                      </td>
                       <td className="py-4">
                         <span className="inline-flex items-center gap-2 font-semibold text-xs">
-                          <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: methodColor }} />
+                          <span
+                            className="h-2.5 w-2.5 rounded-full"
+                            style={{ backgroundColor: methodColor }}
+                          />
                           {formattedMethodName}
                         </span>
                       </td>
@@ -144,7 +220,9 @@ function HistoryPage() {
                       <td className="py-4 text-muted-foreground">{r.temperature}°C</td>
                       <td className="py-4 text-muted-foreground">{r.humidity}%</td>
                       <td className="py-4">
-                        <Badge className="rounded-full bg-forest/15 text-forest border-transparent hover:bg-forest/15">{r.score}%</Badge>
+                        <Badge className="rounded-full bg-forest/15 text-forest border-transparent hover:bg-forest/15">
+                          {r.score}%
+                        </Badge>
                       </td>
                     </tr>
                   );
@@ -175,12 +253,16 @@ function HistoryPage() {
                     className="absolute -left-[1.85rem] top-1.5 h-3.5 w-3.5 rounded-full ring-4 ring-background"
                     style={{ backgroundColor: methodColor }}
                   />
-                  <div className="text-[10px] text-muted-foreground font-semibold">{formatDate(r.createdAt)}</div>
+                  <div className="text-[10px] text-muted-foreground font-semibold">
+                    {formatDate(r.createdAt)}
+                  </div>
                   <div className="font-bold text-foreground mt-0.5 text-xs">
-                    {formattedMethodName} Process @ <span className="text-accent">{r.location}</span>
+                    {formattedMethodName} Process @{" "}
+                    <span className="text-accent">{r.location}</span>
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    {r.rainfall} mm rain · {r.temperature}°C · {r.humidity}% humidity · Match Score {r.score}%
+                    {r.rainfall} mm rain · {r.temperature}°C · {r.humidity}% humidity · Match Score{" "}
+                    {r.score}%
                   </div>
                 </li>
               );

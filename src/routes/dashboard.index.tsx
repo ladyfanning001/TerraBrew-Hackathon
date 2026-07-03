@@ -56,8 +56,19 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export const Route = createFileRoute("/dashboard/")({
   component: DashboardHome,
@@ -75,20 +86,23 @@ const saveRecommendationFn = createServerFn({ method: "POST" })
       grade: z.string(),
       recommendedMethod: z.string(),
       score: z.number(),
-    })
+    }),
   )
   .handler(async ({ data }) => {
     try {
-      const result = await db.insert(recommendationHistory).values({
-        location: data.location,
-        rainfall: data.rainfall,
-        water: data.water,
-        temperature: data.temperature,
-        humidity: data.humidity,
-        grade: data.grade,
-        recommendedMethod: data.recommendedMethod,
-        score: data.score,
-      }).returning();
+      const result = await db
+        .insert(recommendationHistory)
+        .values({
+          location: data.location,
+          rainfall: data.rainfall,
+          water: data.water,
+          temperature: data.temperature,
+          humidity: data.humidity,
+          grade: data.grade,
+          recommendedMethod: data.recommendedMethod,
+          score: data.score,
+        })
+        .returning();
       return { success: true, record: result[0] };
     } catch (e: any) {
       console.error("Database insert error:", e);
@@ -267,7 +281,11 @@ function DashboardHome() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<any[]>(GLOBAL_COFFEE_PRESETS);
   const [activeLocation, setActiveLocation] = useState<string | null>(null);
-  const [coordinates, setCoordinates] = useState<{ lat: string; lng: string; elevation: string } | null>(null);
+  const [coordinates, setCoordinates] = useState<{
+    lat: string;
+    lng: string;
+    elevation: string;
+  } | null>(null);
   const [isLocationConfirmed, setIsLocationConfirmed] = useState<boolean | null>(null);
 
   // Environmental inputs states
@@ -291,7 +309,6 @@ function DashboardHome() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
 
-
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
   // Debounced live global geocoding fetch from Open-Meteo Geocoding API
@@ -314,8 +331,8 @@ function DashboardHome() {
     const delayDebounceFn = setTimeout(() => {
       fetch(
         `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
-          locationInput
-        )}&count=8&language=en&format=json`
+          locationInput,
+        )}&count=8&language=en&format=json`,
       )
         .then((res) => res.json())
         .then((data) => {
@@ -377,16 +394,21 @@ function DashboardHome() {
   }, []);
 
   // Fetch real-time weather from Open-Meteo API using coordinates
-  const fetchWeatherForCoords = async (name: string, lat: string, lng: string, elevation: string) => {
+  const fetchWeatherForCoords = async (
+    name: string,
+    lat: string,
+    lng: string,
+    elevation: string,
+  ) => {
     setIsLoading(true);
     setIsLocationConfirmed(null);
 
     try {
       const response = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,rain,cloudcover,windspeed_10m`
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,rain,cloudcover,windspeed_10m`,
       );
       if (!response.ok) throw new Error("Failed to fetch weather data");
-      
+
       const data = await response.json();
       const current = data.current;
 
@@ -404,12 +426,11 @@ function DashboardHome() {
 
       setCoordinates({ lat, lng, elevation });
       setActiveLocation(name);
-      
+
       // Update global header weather
       const weatherPayload = { name: name.split(",")[0].split(" (")[0], temp, humidity: hum };
       localStorage.setItem("current_location", JSON.stringify(weatherPayload));
       window.dispatchEvent(new Event("weather-update"));
-
     } catch (error) {
       console.error("Open-Meteo Fetch Error:", error);
       setTemperature([23]);
@@ -424,7 +445,12 @@ function DashboardHome() {
     }
   };
 
-  const handleSelectLocation = (preset: { name: string; lat: string; lng: string; elevation: string }) => {
+  const handleSelectLocation = (preset: {
+    name: string;
+    lat: string;
+    lng: string;
+    elevation: string;
+  }) => {
     setLocationInput(preset.name);
     setShowSuggestions(false);
     fetchWeatherForCoords(preset.name, preset.lat, preset.lng, preset.elevation);
@@ -460,9 +486,9 @@ function DashboardHome() {
     const c = cloudCover[0];
     const wS = windSpeed[0];
     const fd = fermentationDuration[0];
-    
+
     // Auto-infer water availability based on rainfall and humidity
-    const w = Math.min(100, Math.max(10, 100 - (h * 0.4) + (r * 1.5)));
+    const w = Math.min(100, Math.max(10, 100 - h * 0.4 + r * 1.5));
 
     // 1. WASHED
     // Air melimpah (w > 75), Musim hujan + air banyak, Curah hujan tinggi + RH tinggi
@@ -521,7 +547,16 @@ function DashboardHome() {
       wine: clamp(wine),
       natural: clamp(natural),
     };
-  }, [rainfall, temperature, humidity, grade, cloudCover, windSpeed, fermentationDuration, hasDepulper]);
+  }, [
+    rainfall,
+    temperature,
+    humidity,
+    grade,
+    cloudCover,
+    windSpeed,
+    fermentationDuration,
+    hasDepulper,
+  ]);
 
   // Determine top pick key
   const topKey = useMemo(() => {
@@ -542,12 +577,15 @@ function DashboardHome() {
 
     if (temp > 45) return "Thermal damage (Aroma flattening, roasted defect, low acidity)";
     if (h > 70) return "Risk of mold & acidity defect (High BOD/COD in wastewater)";
-    if (fd > 96 && selected !== "wine") return "Over-fermentation risk (Vinegar defect, off-flavors)";
-    
-    if (temp >= 20 && temp <= 30 && h >= 50 && h <= 55) return "High specialty potential (Stable metabolites)";
-    if (selected === "natural" && h < 60 && r < 15) return "High fruity sweetness (Intense fruitiness)";
+    if (fd > 96 && selected !== "wine")
+      return "Over-fermentation risk (Vinegar defect, off-flavors)";
+
+    if (temp >= 20 && temp <= 30 && h >= 50 && h <= 55)
+      return "High specialty potential (Stable metabolites)";
+    if (selected === "natural" && h < 60 && r < 15)
+      return "High fruity sweetness (Intense fruitiness)";
     if (selected === "honey" && h >= 50 && h <= 65) return "Increased body & sweetness";
-    
+
     return "Standard flavor profile based on process type";
   }, [humidity, temperature, rainfall, topKey, fermentationDuration]);
 
@@ -555,7 +593,7 @@ function DashboardHome() {
     const h = humidity[0];
     const r = rainfall[0];
     const temp = temperature[0];
-    const w = Math.min(100, Math.max(10, 100 - (h * 0.4) + (r * 1.5)));
+    const w = Math.min(100, Math.max(10, 100 - h * 0.4 + r * 1.5));
 
     return Object.entries(METHOD_DETAILS).map(([key, meta]) => {
       let feasibility = "Safe";
@@ -571,7 +609,8 @@ function DashboardHome() {
           logic = "Extremely high water demand. Insufficient local water resource.";
         } else if (r > 20 && h > 65) {
           feasibility = "Best Choice";
-          feasibilityClass = "bg-emerald-500/10 text-emerald-700 border-emerald-500/20 font-extrabold";
+          feasibilityClass =
+            "bg-emerald-500/10 text-emerald-700 border-emerald-500/20 font-extrabold";
           logic = "Wet environment protects process from drying mold contamination.";
         } else {
           feasibility = "Feasible";
@@ -619,7 +658,8 @@ function DashboardHome() {
           logic = "Rain or high humidity (>70%) triggers heavy mold & black bean defects.";
         } else {
           feasibility = "Highly Recommended";
-          feasibilityClass = "bg-emerald-500/10 text-emerald-700 border-emerald-500/20 font-extrabold";
+          feasibilityClass =
+            "bg-emerald-500/10 text-emerald-700 border-emerald-500/20 font-extrabold";
           logic = "Zero-water process. Dry, low-humidity conditions promote fast sun-drying.";
         }
       }
@@ -730,12 +770,17 @@ function DashboardHome() {
 
     if (r > 15) return { status: "Rewetting risk", action: "Close solar dryer" };
     if (h > 70) {
-       if (wS > 15) return { status: "High risk (Mitigated by Wind)", action: "Continue natural ventilation, monitor RH" };
-       return { status: "High risk", action: "Close dryer / activate mechanical ventilation" };
+      if (wS > 15)
+        return {
+          status: "High risk (Mitigated by Wind)",
+          action: "Continue natural ventilation, monitor RH",
+        };
+      return { status: "High risk", action: "Close dryer / activate mechanical ventilation" };
     }
     if (temp > 35) return { status: "Overheating risk", action: "Reduce hot airflow" };
-    if (temp >= 20 && temp <= 35 && h >= 50 && h <= 55) return { status: "Optimal", action: "Continue drying" };
-    
+    if (temp >= 20 && temp <= 35 && h >= 50 && h <= 55)
+      return { status: "Optimal", action: "Continue drying" };
+
     return { status: "Monitoring Needed", action: "Continue parameter monitoring" };
   }, [humidity, temperature, rainfall, windSpeed]);
 
@@ -744,23 +789,28 @@ function DashboardHome() {
       {/* Page Header */}
       <div>
         <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-accent font-semibold">
-          <Sparkles className="h-3.5 w-3.5 animate-spin" style={{ animationDuration: '4s' }} /> TerraBrew smart engine
+          <Sparkles className="h-3.5 w-3.5 animate-spin" style={{ animationDuration: "4s" }} />{" "}
+          TerraBrew smart engine
         </div>
         <h1 className="mt-1 text-2xl font-bold tracking-tight md:text-3xl text-primary">
           Smart Post-Harvest Predictor
         </h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Sync real-time weather by entering location names, raw coordinates (e.g. `6.25, -75.56`), or manually adjusting variables.
+          Sync real-time weather by entering location names, raw coordinates (e.g. `6.25, -75.56`),
+          or manually adjusting variables.
         </p>
       </div>
-          {/* INPUTS FORM CARD */}
-          <Card className="rounded-2xl border-border bg-card shadow-[var(--shadow-soft)] overflow-hidden">
+      {/* INPUTS FORM CARD */}
+      <Card className="rounded-2xl border-border bg-card shadow-[var(--shadow-soft)] overflow-hidden">
         <CardHeader className="bg-secondary/20 border-b border-border/40">
           <CardTitle className="flex items-center gap-2 text-primary font-bold text-lg">
             <Coffee className="h-5 w-5 text-accent" />
             Preprocessing Environment Form
           </CardTitle>
-          <CardDescription>Enter values manually or sync them automatically by searching global locations or direct coordinates.</CardDescription>
+          <CardDescription>
+            Enter values manually or sync them automatically by searching global locations or direct
+            coordinates.
+          </CardDescription>
         </CardHeader>
         <CardContent className="p-6 space-y-8">
           {/* STEP 1: Location Sync & Batch Setup */}
@@ -791,7 +841,11 @@ function DashboardHome() {
                       </span>
                     )}
                   </div>
-                  <Button type="submit" disabled={isLoading} className="bg-forest text-cream hover:bg-forest-deep text-xs font-bold px-4">
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="bg-forest text-cream hover:bg-forest-deep text-xs font-bold px-4"
+                  >
                     <Search className="h-4 w-4 mr-1.5" />
                     {isLoading ? "Syncing..." : "Sync Weather"}
                   </Button>
@@ -808,7 +862,9 @@ function DashboardHome() {
                         className="w-full text-left px-4 py-2.5 text-xs hover:bg-secondary/40 transition-colors flex items-center justify-between"
                       >
                         <span className="font-bold text-foreground">{preset.name}</span>
-                        <span className="text-[10px] text-muted-foreground font-semibold">Elev: {preset.elevation} | Coord: {preset.lat}, {preset.lng}</span>
+                        <span className="text-[10px] text-muted-foreground font-semibold">
+                          Elev: {preset.elevation} | Coord: {preset.lat}, {preset.lng}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -817,7 +873,10 @@ function DashboardHome() {
 
               {/* Batch setup at first */}
               <div className="flex flex-col gap-2">
-                <Label htmlFor="batch-weight-input-top" className="text-xs font-bold text-foreground">
+                <Label
+                  htmlFor="batch-weight-input-top"
+                  className="text-xs font-bold text-foreground"
+                >
                   📦 Batch Size / Harvest Weight (kg cherry)
                 </Label>
                 <div className="relative">
@@ -844,13 +903,22 @@ function DashboardHome() {
                       <Globe className="h-5 w-5 animate-pulse" />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-foreground">Global Weather API Sync Verified</div>
+                      <div className="text-xs font-bold text-foreground">
+                        Global Weather API Sync Verified
+                      </div>
                       <div className="text-[11px] text-muted-foreground mt-0.5">
-                        Fetched coordinates: <span className="font-bold text-foreground">{coordinates?.lat}° N, {coordinates?.lng}° E</span> ({coordinates?.elevation} elevation)
+                        Fetched coordinates:{" "}
+                        <span className="font-bold text-foreground">
+                          {coordinates?.lat}° N, {coordinates?.lng}° E
+                        </span>{" "}
+                        ({coordinates?.elevation} elevation)
                       </div>
                     </div>
                   </div>
-                  <Badge variant="secondary" className="bg-forest/15 text-forest border-transparent py-1 self-start sm:self-auto">
+                  <Badge
+                    variant="secondary"
+                    className="bg-forest/15 text-forest border-transparent py-1 self-start sm:self-auto"
+                  >
                     🟢 Live Open-Meteo API OK
                   </Badge>
                 </div>
@@ -858,7 +926,8 @@ function DashboardHome() {
                 {/* Verification/Confirmation Checkbox */}
                 <div className="pt-2 border-t border-border/40 flex flex-wrap items-center justify-between gap-3">
                   <span className="text-[11px] text-muted-foreground font-semibold">
-                    Is the weather data for <strong className="text-foreground">{activeLocation}</strong> below correct?
+                    Is the weather data for{" "}
+                    <strong className="text-foreground">{activeLocation}</strong> below correct?
                   </span>
                   <div className="flex gap-2">
                     <Button
@@ -986,13 +1055,21 @@ function DashboardHome() {
                   </Label>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold text-foreground">Depulper Machine</span>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => setHasDepulper(!hasDepulper)}
-                      className={hasDepulper ? "bg-accent/15 text-accent border-accent hover:bg-accent/20" : "bg-card text-muted-foreground"}
+                      className={
+                        hasDepulper
+                          ? "bg-accent/15 text-accent border-accent hover:bg-accent/20"
+                          : "bg-card text-muted-foreground"
+                      }
                     >
-                      {hasDepulper ? <CheckCircle2 className="h-4 w-4 mr-1.5"/> : <X className="h-4 w-4 mr-1.5"/>}
+                      {hasDepulper ? (
+                        <CheckCircle2 className="h-4 w-4 mr-1.5" />
+                      ) : (
+                        <X className="h-4 w-4 mr-1.5" />
+                      )}
                       {hasDepulper ? "Available" : "Unavailable"}
                     </Button>
                   </div>
@@ -1011,7 +1088,9 @@ function DashboardHome() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="A">Grade A — Specialty Cherry (Perfect ripeness)</SelectItem>
+                      <SelectItem value="A">
+                        Grade A — Specialty Cherry (Perfect ripeness)
+                      </SelectItem>
                       <SelectItem value="B">Grade B — Premium Grade Cherry</SelectItem>
                       <SelectItem value="C">Grade C — Commercial Grade Cherry</SelectItem>
                     </SelectContent>
@@ -1027,7 +1106,7 @@ function DashboardHome() {
               size="lg"
               onClick={async () => {
                 setHasCalculated(true);
-                
+
                 // Write prediction to PostgreSQL Database via Server Function
                 try {
                   await saveRecommendationFn({
@@ -1036,10 +1115,11 @@ function DashboardHome() {
                       rainfall: rainfall[0],
                       temperature: temperature[0],
                       humidity: humidity[0],
+                      water: 0,
                       grade: grade,
                       recommendedMethod: topKey,
                       score: scores[topKey],
-                    }
+                    },
                   });
                 } catch (dbErr) {
                   console.error("Failed to log to PostgreSQL:", dbErr);
@@ -1047,7 +1127,9 @@ function DashboardHome() {
 
                 // Scroll page smoothly to results
                 setTimeout(() => {
-                  document.getElementById("recommendation-results")?.scrollIntoView({ behavior: "smooth" });
+                  document
+                    .getElementById("recommendation-results")
+                    ?.scrollIntoView({ behavior: "smooth" });
                 }, 100);
               }}
               className="bg-coffee text-cream hover:bg-coffee-deep rounded-full font-bold px-8 shadow-md flex items-center gap-2"
@@ -1072,7 +1154,9 @@ function DashboardHome() {
                   <Award className="h-6 w-6 text-cream" />
                 </div>
                 <div>
-                  <div className="text-xs uppercase tracking-widest text-cream/70">Recommended Preprocessing</div>
+                  <div className="text-xs uppercase tracking-widest text-cream/70">
+                    Recommended Preprocessing
+                  </div>
                   <div className="text-xl font-bold tracking-tight text-cream">
                     {recommendedData.name}
                   </div>
@@ -1109,20 +1193,29 @@ function DashboardHome() {
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <div className="h-2 w-8 rounded-full" style={{ backgroundColor: meta.color }} />
+                        <div
+                          className="h-2 w-8 rounded-full"
+                          style={{ backgroundColor: meta.color }}
+                        />
                         {isTop && (
                           <Badge className="rounded-full bg-accent text-[9px] font-bold text-cream hover:bg-accent border-transparent">
                             Top Pick
                           </Badge>
                         )}
                       </div>
-                      <h3 className="mt-3 text-sm font-bold text-foreground leading-tight">{meta.name.split(" ")[0]}</h3>
+                      <h3 className="mt-3 text-sm font-bold text-foreground leading-tight">
+                        {meta.name.split(" ")[0]}
+                      </h3>
                       <div className="mt-4 space-y-2">
                         <div className="flex items-center justify-between text-[10px]">
                           <span className="text-muted-foreground">Match Score</span>
                           <span className="font-bold text-foreground">{scores[mKey]}%</span>
                         </div>
-                        <Progress value={scores[mKey]} className="h-1 bg-border" style={{ "--progress-background": meta.color } as any} />
+                        <Progress
+                          value={scores[mKey]}
+                          className="h-1 bg-border"
+                          style={{ "--progress-background": meta.color } as any}
+                        />
                       </div>
                     </div>
                   );
@@ -1140,7 +1233,9 @@ function DashboardHome() {
                       Sustainability & Waste Footprint Calculator
                     </h4>
                     <p className="text-xs text-muted-foreground">
-                      Waste estimations and environmental compatibility dashboard for batch size: <strong className="text-foreground">{batchWeight.toLocaleString()} kg</strong>.
+                      Waste estimations and environmental compatibility dashboard for batch size:{" "}
+                      <strong className="text-foreground">{batchWeight.toLocaleString()} kg</strong>
+                      .
                     </p>
                   </div>
                 </div>
@@ -1168,7 +1263,7 @@ function DashboardHome() {
                         <Droplets className="h-3.5 w-3.5 text-emerald-500" /> Wastewater Generated
                       </span>
                       <div className="text-2xl font-extrabold text-emerald-600 mt-2">
-                        {recommendedData.name.includes("Washed") 
+                        {recommendedData.name.includes("Washed")
                           ? `${(batchWeight * recommendedData.waterLiters * 0.85).toLocaleString()} L`
                           : "0 L (Waterless)"}
                       </div>
@@ -1185,7 +1280,7 @@ function DashboardHome() {
                         <Scale className="h-3.5 w-3.5 text-amber-600" /> Coffee Pulp/Husks Produced
                       </span>
                       <div className="text-2xl font-extrabold text-amber-700 mt-2">
-                        {(batchWeight * 0.40).toLocaleString()} kg
+                        {(batchWeight * 0.4).toLocaleString()} kg
                       </div>
                     </div>
                     <p className="text-[10px] text-muted-foreground mt-2">
@@ -1213,9 +1308,15 @@ function DashboardHome() {
                       </thead>
                       <tbody>
                         {processComparisons.map((item) => (
-                          <tr key={item.key} className={`border-b border-border/40 hover:bg-secondary/10 transition-colors ${item.key === topKey ? "bg-emerald-500/5 font-semibold" : ""}`}>
+                          <tr
+                            key={item.key}
+                            className={`border-b border-border/40 hover:bg-secondary/10 transition-colors ${item.key === topKey ? "bg-emerald-500/5 font-semibold" : ""}`}
+                          >
                             <td className="py-3 px-4 flex items-center gap-2">
-                              <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                              <span
+                                className="h-2.5 w-2.5 rounded-full shrink-0"
+                                style={{ backgroundColor: item.color }}
+                              />
                               <span>{item.name}</span>
                               {item.key === topKey && (
                                 <Badge className="text-[9px] py-0 px-1.5 bg-emerald-500 text-cream hover:bg-emerald-500 border-transparent rounded">
@@ -1224,13 +1325,19 @@ function DashboardHome() {
                               )}
                             </td>
                             <td className="py-3 px-4 text-center tracking-wider">{item.leaves}</td>
-                            <td className="py-3 px-4 text-right font-bold text-foreground">{(batchWeight * item.waterLiters).toLocaleString()} L</td>
+                            <td className="py-3 px-4 text-right font-bold text-foreground">
+                              {(batchWeight * item.waterLiters).toLocaleString()} L
+                            </td>
                             <td className="py-3 px-4 text-center">
-                              <Badge className={`rounded text-[10px] font-bold py-0.5 px-2 border ${item.feasibilityClass}`}>
+                              <Badge
+                                className={`rounded text-[10px] font-bold py-0.5 px-2 border ${item.feasibilityClass}`}
+                              >
                                 {item.feasibility}
                               </Badge>
                             </td>
-                            <td className="py-3 px-4 text-muted-foreground text-[11px] leading-relaxed max-w-sm">{item.logic}</td>
+                            <td className="py-3 px-4 text-muted-foreground text-[11px] leading-relaxed max-w-sm">
+                              {item.logic}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -1246,13 +1353,33 @@ function DashboardHome() {
                     </span>
                     <div className="flex gap-1 text-xl">
                       {topKey === "natural" || topKey === "wine" ? (
-                        <>🌿🌿🌿🌿🌿 <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full ml-2">Eco-Excellent</span></>
+                        <>
+                          🌿🌿🌿🌿🌿{" "}
+                          <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full ml-2">
+                            Eco-Excellent
+                          </span>
+                        </>
                       ) : topKey === "honey" ? (
-                        <>🌿🌿🌿🌿 <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full ml-2">Very High</span></>
+                        <>
+                          🌿🌿🌿🌿{" "}
+                          <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full ml-2">
+                            Very High
+                          </span>
+                        </>
                       ) : topKey === "semi_washed" ? (
-                        <>🌿🌿🌿 <span className="text-xs font-bold text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded-full ml-2">Moderate</span></>
+                        <>
+                          🌿🌿🌿{" "}
+                          <span className="text-xs font-bold text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded-full ml-2">
+                            Moderate
+                          </span>
+                        </>
                       ) : (
-                        <>🌿 <span className="text-xs font-bold text-rose-600 bg-rose-500/10 px-2 py-0.5 rounded-full ml-2">Low (Resource Intensive)</span></>
+                        <>
+                          🌿{" "}
+                          <span className="text-xs font-bold text-rose-600 bg-rose-500/10 px-2 py-0.5 rounded-full ml-2">
+                            Low (Resource Intensive)
+                          </span>
+                        </>
                       )}
                     </div>
                     <p className="text-[10px] text-muted-foreground leading-normal">
@@ -1265,28 +1392,27 @@ function DashboardHome() {
                       Waste Management Action Plan
                     </span>
                     <div className="bg-card p-3.5 rounded-xl border border-emerald-500/10 text-xs text-foreground font-medium leading-relaxed">
-                      {topKey === "washed" && (
-                        "Washed process produces heavy acidic wastewater (pH ~4.5) loaded with soluble sugars and pectins. It has a high Chemical Oxygen Demand (COD). Required Action: Run wastewater through a series of anaerobic/aerobic lagoons and apply agricultural lime to neutralize acidity before discharge. Solid pulp must be composted separately."
-                      )}
-                      {topKey === "semi_washed" && (
-                        "Semi-washed uses moderate water. Wastewater is acidic and rich in organic matter. Required Action: Divert washwater to a stabilization pond. Compost pulped mucilage and skin with farm manure to produce organic fertilizer."
-                      )}
-                      {topKey === "honey" && (
-                        "Honey process generates minimal wastewater since mucilage is left on the bean. Required Action: Zero wastewater discharge. Pulped skins must be immediately spread out to compost, preventing anaerobic rot and foul odors."
-                      )}
-                      {topKey === "wine" && (
-                        "Extended anaerobic whole coffee cherry process uses virtually no water, creating zero liquid waste. Required Action: Composting of whole dried cherries after hulling. High nutrient husks make excellent organic mulch."
-                      )}
-                      {topKey === "natural" && (
-                        "Natural process is completely waterless, yielding zero wastewater. Required Action: Recycle dried coffee husks (cascara) after hulling as high-potassium organic fertilizer or organic mulch for the coffee trees."
-                      )}
+                      {topKey === "washed" &&
+                        "Washed process produces heavy acidic wastewater (pH ~4.5) loaded with soluble sugars and pectins. It has a high Chemical Oxygen Demand (COD). Required Action: Run wastewater through a series of anaerobic/aerobic lagoons and apply agricultural lime to neutralize acidity before discharge. Solid pulp must be composted separately."}
+                      {topKey === "semi_washed" &&
+                        "Semi-washed uses moderate water. Wastewater is acidic and rich in organic matter. Required Action: Divert washwater to a stabilization pond. Compost pulped mucilage and skin with farm manure to produce organic fertilizer."}
+                      {topKey === "honey" &&
+                        "Honey process generates minimal wastewater since mucilage is left on the bean. Required Action: Zero wastewater discharge. Pulped skins must be immediately spread out to compost, preventing anaerobic rot and foul odors."}
+                      {topKey === "wine" &&
+                        "Extended anaerobic whole coffee cherry process uses virtually no water, creating zero liquid waste. Required Action: Composting of whole dried cherries after hulling. High nutrient husks make excellent organic mulch."}
+                      {topKey === "natural" &&
+                        "Natural process is completely waterless, yielding zero wastewater. Required Action: Recycle dried coffee husks (cascara) after hulling as high-potassium organic fertilizer or organic mulch for the coffee trees."}
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Journal data accordions */}
-              <Accordion type="single" defaultValue="process" className="w-full border-t border-border pt-4">
+              <Accordion
+                type="single"
+                defaultValue="process"
+                className="w-full border-t border-border pt-4"
+              >
                 {/* 1. Process Specs */}
                 <AccordionItem value="process" className="border-border">
                   <AccordionTrigger className="hover:no-underline py-3">
@@ -1296,41 +1422,64 @@ function DashboardHome() {
                   </AccordionTrigger>
                   <AccordionContent className="grid gap-6 sm:grid-cols-2 md:grid-cols-4 pt-2 text-xs">
                     <div className="space-y-1">
-                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">Harvest Mode</div>
+                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">
+                        Harvest Mode
+                      </div>
                       <div className="font-bold text-foreground">{recommendedData.harvest}</div>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">Depulping</div>
+                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">
+                        Depulping
+                      </div>
                       <div className="font-bold text-foreground">{recommendedData.depulping}</div>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">Fermentation Type</div>
-                      <div className="font-bold text-foreground">{recommendedData.fermentation}</div>
+                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">
+                        Fermentation Type
+                      </div>
+                      <div className="font-bold text-foreground">
+                        {recommendedData.fermentation}
+                      </div>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">Water Requirement</div>
+                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">
+                        Water Requirement
+                      </div>
                       <div className="font-bold text-foreground">{recommendedData.water}</div>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">Oxygen State</div>
+                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">
+                        Oxygen State
+                      </div>
                       <div className="font-bold text-foreground">{recommendedData.oxygen}</div>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">Drying System</div>
+                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">
+                        Drying System
+                      </div>
                       <div className="font-bold text-foreground">{recommendedData.drying}</div>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">Moisture Target</div>
-                      <div className="font-bold text-foreground">{recommendedData.moistureTarget}</div>
+                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">
+                        Moisture Target
+                      </div>
+                      <div className="font-bold text-foreground">
+                        {recommendedData.moistureTarget}
+                      </div>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">Main Microbes</div>
+                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">
+                        Main Microbes
+                      </div>
                       <div className="font-bold text-foreground flex items-center gap-1">
-                        <FlaskConical className="h-3 w-3 text-accent shrink-0" /> {recommendedData.microbe}
+                        <FlaskConical className="h-3 w-3 text-accent shrink-0" />{" "}
+                        {recommendedData.microbe}
                       </div>
                     </div>
                     <div className="space-y-1 sm:col-span-2">
-                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">Recommended Duration</div>
+                      <div className="text-muted-foreground uppercase text-[9px] tracking-wider font-semibold">
+                        Recommended Duration
+                      </div>
                       <div className="font-bold text-foreground">{recommendedData.duration}</div>
                     </div>
                   </AccordionContent>
@@ -1340,50 +1489,78 @@ function DashboardHome() {
                 <AccordionItem value="chemistry" className="border-border">
                   <AccordionTrigger className="hover:no-underline py-3">
                     <span className="flex items-center gap-2 font-bold text-sm text-primary">
-                      <FlaskConical className="h-4 w-4 text-accent" /> Predicted Physicochemical & Flavor Output
+                      <FlaskConical className="h-4 w-4 text-accent" /> Predicted Physicochemical &
+                      Flavor Output
                     </span>
                   </AccordionTrigger>
                   <AccordionContent className="pt-2">
                     <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-5 text-xs">
                       <div className="space-y-1 bg-secondary/20 p-2.5 rounded-xl border border-border/40">
-                        <div className="text-muted-foreground text-[9px] uppercase font-semibold">pH Target</div>
-                        <div className="font-bold text-foreground text-sm">{recommendedData.ph}</div>
+                        <div className="text-muted-foreground text-[9px] uppercase font-semibold">
+                          pH Target
+                        </div>
+                        <div className="font-bold text-foreground text-sm">
+                          {recommendedData.ph}
+                        </div>
                       </div>
                       <div className="space-y-1 bg-secondary/20 p-2.5 rounded-xl border border-border/40">
-                        <div className="text-muted-foreground text-[9px] uppercase font-semibold">Titratable Acidity</div>
-                        <div className="font-bold text-foreground text-sm">{recommendedData.acidity}</div>
+                        <div className="text-muted-foreground text-[9px] uppercase font-semibold">
+                          Titratable Acidity
+                        </div>
+                        <div className="font-bold text-foreground text-sm">
+                          {recommendedData.acidity}
+                        </div>
                       </div>
                       <div className="space-y-1 bg-secondary/20 p-2.5 rounded-xl border border-border/40">
-                        <div className="text-muted-foreground text-[9px] uppercase font-semibold">Ester Volatiles</div>
-                        <div className="font-bold text-foreground text-sm">{recommendedData.ester}</div>
+                        <div className="text-muted-foreground text-[9px] uppercase font-semibold">
+                          Ester Volatiles
+                        </div>
+                        <div className="font-bold text-foreground text-sm">
+                          {recommendedData.ester}
+                        </div>
                       </div>
                       <div className="space-y-1 bg-secondary/20 p-2.5 rounded-xl border border-border/40">
-                        <div className="text-muted-foreground text-[9px] uppercase font-semibold">Residual Sugar</div>
-                        <div className="font-bold text-foreground text-sm">{recommendedData.sugar}</div>
+                        <div className="text-muted-foreground text-[9px] uppercase font-semibold">
+                          Residual Sugar
+                        </div>
+                        <div className="font-bold text-foreground text-sm">
+                          {recommendedData.sugar}
+                        </div>
                       </div>
                       <div className="space-y-1 bg-secondary/20 p-2.5 rounded-xl border border-border/40">
-                        <div className="text-muted-foreground text-[9px] uppercase font-semibold">Moisture Uniformity</div>
-                        <div className="font-bold text-foreground text-sm">{recommendedData.uniformity}</div>
+                        <div className="text-muted-foreground text-[9px] uppercase font-semibold">
+                          Moisture Uniformity
+                        </div>
+                        <div className="font-bold text-foreground text-sm">
+                          {recommendedData.uniformity}
+                        </div>
                       </div>
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-3 mt-4 text-xs">
                       <div className="p-3 border border-border rounded-xl bg-card">
-                        <div className="text-muted-foreground font-semibold text-[10px]">ORGANIC CHEMICAL COMPOUND</div>
+                        <div className="text-muted-foreground font-semibold text-[10px]">
+                          ORGANIC CHEMICAL COMPOUND
+                        </div>
                         <ul className="mt-2 space-y-1 text-foreground font-medium">
                           <li>• Caffeine level: {recommendedData.caffeine}</li>
                           <li>• Chlorogenic Acid: {recommendedData.chlorogenic}</li>
                           <li>• Alcohol compound: {recommendedData.alcohol}</li>
-                          <li>• Protein/Fat levels: {recommendedData.protein} / {recommendedData.fat}</li>
+                          <li>
+                            • Protein/Fat levels: {recommendedData.protein} / {recommendedData.fat}
+                          </li>
                         </ul>
                       </div>
                       <div className="p-3 border border-border rounded-xl bg-card md:col-span-2">
-                        <div className="text-muted-foreground font-semibold text-[10px]">PREDICTED SENSORY PROFILE</div>
+                        <div className="text-muted-foreground font-semibold text-[10px]">
+                          PREDICTED SENSORY PROFILE
+                        </div>
                         <p className="mt-2 text-foreground font-bold text-sm leading-relaxed">
                           {recommendedData.flavor}
                         </p>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          *Flavor outcomes derived from peer-reviewed post-harvest microbiological fermentation profiles.
+                          *Flavor outcomes derived from peer-reviewed post-harvest microbiological
+                          fermentation profiles.
                         </p>
                       </div>
                     </div>
@@ -1394,7 +1571,8 @@ function DashboardHome() {
                 <AccordionItem value="drying" className="border-border">
                   <AccordionTrigger className="hover:no-underline py-3">
                     <span className="flex items-center gap-2 font-bold text-sm text-primary">
-                      <Flame className="h-4 w-4 text-accent" /> Drying System Controller & Action Plan
+                      <Flame className="h-4 w-4 text-accent" /> Drying System Controller & Action
+                      Plan
                     </span>
                   </AccordionTrigger>
                   <AccordionContent className="pt-2 text-xs space-y-3">
@@ -1402,7 +1580,9 @@ function DashboardHome() {
                       <div className="flex gap-2.5 items-center">
                         <span className="h-2 w-2 rounded-full bg-accent animate-ping" />
                         <div>
-                          <div className="font-bold text-foreground text-xs uppercase tracking-wider">Current Decision State</div>
+                          <div className="font-bold text-foreground text-xs uppercase tracking-wider">
+                            Current Decision State
+                          </div>
                           <div className="text-sm font-bold text-accent">{dryingAction.status}</div>
                         </div>
                       </div>
@@ -1415,19 +1595,24 @@ function DashboardHome() {
                       <div className="p-3 border border-border rounded-xl">
                         <h4 className="font-bold text-foreground text-xs">RH &gt;70% Limit</h4>
                         <p className="text-muted-foreground text-[11px] mt-1 leading-relaxed">
-                          Close solar dryer if rain is detected, or activate heating ventilation if RH is too high.
+                          Close solar dryer if rain is detected, or activate heating ventilation if
+                          RH is too high.
                         </p>
                       </div>
                       <div className="p-3 border border-border rounded-xl">
-                        <h4 className="font-bold text-foreground text-xs">20–35°C Target Temperature</h4>
+                        <h4 className="font-bold text-foreground text-xs">
+                          20–35°C Target Temperature
+                        </h4>
                         <p className="text-muted-foreground text-[11px] mt-1 leading-relaxed">
-                          Maintain constant air circulation. Reduce hot airflow if sensor temperature exceeds 35°C.
+                          Maintain constant air circulation. Reduce hot airflow if sensor
+                          temperature exceeds 35°C.
                         </p>
                       </div>
                       <div className="p-3 border border-border rounded-xl">
                         <h4 className="font-bold text-foreground text-xs">Ideal Moisture Target</h4>
                         <p className="text-muted-foreground text-[11px] mt-1 leading-relaxed">
-                          Maintaining bean internal moisture at 10–12% ensures uniform and stable cup quality.
+                          Maintaining bean internal moisture at 10–12% ensures uniform and stable
+                          cup quality.
                         </p>
                       </div>
                     </div>
@@ -1447,40 +1632,85 @@ function DashboardHome() {
                   Sustainability & Preprocessing Analytics
                 </CardTitle>
                 <CardDescription>
-                  Comparing method compatibility scores against water consumption (Liters per kg Cherry)
+                  Comparing method compatibility scores against water consumption (Liters per kg
+                  Cherry)
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-6 md:grid-cols-2">
                 {/* Radar chart showing fit values */}
                 <div className="h-72 flex flex-col justify-center">
-                  <div className="text-xs font-semibold text-center text-muted-foreground mb-1">Preprocessing Match Matrix (%)</div>
+                  <div className="text-xs font-semibold text-center text-muted-foreground mb-1">
+                    Preprocessing Match Matrix (%)
+                  </div>
                   <ResponsiveContainer width="100%" height="90%">
                     <RadarChart data={radarData}>
                       <PolarGrid stroke="var(--border)" />
-                      <PolarAngleAxis dataKey="parameter" tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: "600" }} />
+                      <PolarAngleAxis
+                        dataKey="parameter"
+                        tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: "600" }}
+                      />
                       <PolarRadiusAxis tick={false} axisLine={false} />
-                      <Radar name="Compatibility" dataKey="Score" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.3} />
-                      <RTooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12 }} />
+                      <Radar
+                        name="Compatibility"
+                        dataKey="Score"
+                        stroke="var(--accent)"
+                        fill="var(--accent)"
+                        fillOpacity={0.3}
+                      />
+                      <RTooltip
+                        contentStyle={{
+                          background: "var(--card)",
+                          border: "1px solid var(--border)",
+                          borderRadius: 12,
+                        }}
+                      />
                     </RadarChart>
                   </ResponsiveContainer>
                 </div>
                 {/* Bar chart showing water footprint in liters */}
                 <div className="h-72 flex flex-col justify-center">
-                  <div className="text-xs font-semibold text-center text-muted-foreground mb-1">Water Footprint (Liters per kg Cherry)</div>
+                  <div className="text-xs font-semibold text-center text-muted-foreground mb-1">
+                    Water Footprint (Liters per kg Cherry)
+                  </div>
                   <ResponsiveContainer width="100%" height="90%">
                     <BarChart data={waterChartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                      <XAxis dataKey="name" tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: "600" }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill: "var(--muted-foreground)", fontSize: 10 }} axisLine={false} tickLine={false} />
-                      <RTooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12 }} />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="var(--border)"
+                        vertical={false}
+                      />
+                      <XAxis
+                        dataKey="name"
+                        tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: "600" }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <RTooltip
+                        contentStyle={{
+                          background: "var(--card)",
+                          border: "1px solid var(--border)",
+                          borderRadius: 12,
+                        }}
+                      />
                       <Bar dataKey="Liters" fill="var(--chart-4)" radius={[8, 8, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
               </CardContent>
               <div className="px-6 pb-4 border-t border-border pt-3 text-[11px] text-muted-foreground space-y-1">
-                <div>💡 **Eco-awareness**: Washed coffee produces a high wastewater footprint, whereas honey and natural processes save up to 90% water.</div>
-                <div>🌲 **Resource warning**: Wastewater from washed coffee has high organic solids and requires proper anaerobic ponds for treatment.</div>
+                <div>
+                  💡 **Eco-awareness**: Washed coffee produces a high wastewater footprint, whereas
+                  honey and natural processes save up to 90% water.
+                </div>
+                <div>
+                  🌲 **Resource warning**: Wastewater from washed coffee has high organic solids and
+                  requires proper anaerobic ponds for treatment.
+                </div>
               </div>
             </Card>
 
@@ -1509,12 +1739,16 @@ function DashboardHome() {
 
                 {/* Environmental wastewater danger metrics */}
                 <div className="mt-4 pt-4 border-t border-border space-y-3">
-                  <h4 className="text-xs font-bold text-foreground">Wastewater & Environmental Impact</h4>
+                  <h4 className="text-xs font-bold text-foreground">
+                    Wastewater & Environmental Impact
+                  </h4>
                   <div className="space-y-2 text-xs">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Method impact risk:</span>
                       <span className="font-bold text-foreground">
-                        {recommendedData.name.includes("Washed") ? "High (Organic Waste)" : "Very Low"}
+                        {recommendedData.name.includes("Washed")
+                          ? "High (Organic Waste)"
+                          : "Very Low"}
                       </span>
                     </div>
                     <div className="space-y-1">
@@ -1537,7 +1771,16 @@ function clamp(n: number) {
   return Math.max(5, Math.min(98, Math.round(n)));
 }
 
-function FormSliderRow({ icon: Icon, label, value, onChange, max, min = 0, unit = "", description }: any) {
+function FormSliderRow({
+  icon: Icon,
+  label,
+  value,
+  onChange,
+  max,
+  min = 0,
+  unit = "",
+  description,
+}: any) {
   return (
     <div className="space-y-2 bg-secondary/10 p-4 rounded-xl border border-border/40">
       <div className="flex items-center justify-between">
@@ -1550,7 +1793,14 @@ function FormSliderRow({ icon: Icon, label, value, onChange, max, min = 0, unit 
         </span>
       </div>
       <div className="flex items-center gap-4 py-1">
-        <Slider value={value} onValueChange={onChange} min={min} max={max} step={1} className="flex-1" />
+        <Slider
+          value={value}
+          onValueChange={onChange}
+          min={min}
+          max={max}
+          step={1}
+          className="flex-1"
+        />
         <Input
           type="number"
           value={value[0]}
@@ -1568,7 +1818,11 @@ function FormSliderRow({ icon: Icon, label, value, onChange, max, min = 0, unit 
 
 function AlertCard({ level, title, desc }: { level: string; title: string; desc: string }) {
   const styles: Record<string, { bg: string; icon: string; text: string }> = {
-    danger: { bg: "border-destructive/30 bg-destructive/5", icon: "text-destructive", text: "text-destructive" },
+    danger: {
+      bg: "border-destructive/30 bg-destructive/5",
+      icon: "text-destructive",
+      text: "text-destructive",
+    },
     warning: { bg: "border-honey/40 bg-honey/10", icon: "text-honey", text: "text-coffee-deep" },
     info: { bg: "border-border bg-secondary/40", icon: "text-accent", text: "text-foreground" },
   };

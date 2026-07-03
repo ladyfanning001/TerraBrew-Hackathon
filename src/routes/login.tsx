@@ -5,7 +5,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import logoImg from "@/assets/Logo TerraBrew.png";
 
@@ -13,7 +20,11 @@ export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       { title: "Sign In — TerraBrew" },
-      { name: "description", content: "Sign in to your TerraBrew account to access coffee predictions and certifications." },
+      {
+        name: "description",
+        content:
+          "Sign in to your TerraBrew account to access coffee predictions and certifications.",
+      },
     ],
   }),
   component: LoginPage,
@@ -55,10 +66,10 @@ function LoginPage() {
     setError(null);
     const testEmail = role === "farmer" ? "petani@terrabrew.com" : "sea@terrabrew.com";
     const testPassword = "password";
-    
+
     setEmail(testEmail);
     setPassword(testPassword);
-    
+
     const res = await login(testEmail, testPassword);
     if (!res.success) {
       setError(res.error || "Failed to sign in with demo credentials.");
@@ -66,10 +77,21 @@ function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4 relative overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
+    <div
+      className="flex min-h-screen items-center justify-center bg-background p-4 relative overflow-hidden"
+      style={{ background: "var(--gradient-hero)" }}
+    >
       {/* Background blobs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] rounded-full opacity-20 blur-3xl pointer-events-none" style={{ background: "radial-gradient(circle, var(--cream) 0%, transparent 70%)" }} />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[35rem] h-[35rem] rounded-full opacity-25 blur-3xl pointer-events-none" style={{ background: "radial-gradient(circle, rgba(39, 67, 43, 0.15) 0%, transparent 70%)" }} />
+      <div
+        className="absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] rounded-full opacity-20 blur-3xl pointer-events-none"
+        style={{ background: "radial-gradient(circle, var(--cream) 0%, transparent 70%)" }}
+      />
+      <div
+        className="absolute bottom-[-10%] right-[-10%] w-[35rem] h-[35rem] rounded-full opacity-25 blur-3xl pointer-events-none"
+        style={{
+          background: "radial-gradient(circle, rgba(39, 67, 43, 0.15) 0%, transparent 70%)",
+        }}
+      />
 
       <div className="w-full max-w-md space-y-6 relative z-10">
         <div className="text-center">
@@ -80,13 +102,17 @@ function LoginPage() {
             <span className="text-xl font-bold tracking-tight text-foreground">TerraBrew</span>
           </Link>
           <h2 className="text-2xl font-bold text-primary tracking-tight">Welcome Back</h2>
-          <p className="text-sm text-muted-foreground mt-1">Optimize coffee processing & manage sustainable certifications.</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Optimize coffee processing & manage sustainable certifications.
+          </p>
         </div>
 
         <Card className="border-border/60 shadow-[var(--shadow-elegant)] rounded-3xl overflow-hidden bg-card/90 backdrop-blur-sm">
           <CardHeader className="space-y-1">
             <CardTitle className="text-xl font-bold text-foreground">Sign In</CardTitle>
-            <CardDescription>Enter your email and password to access your dashboard.</CardDescription>
+            <CardDescription>
+              Enter your email and password to access your dashboard.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -98,7 +124,9 @@ function LoginPage() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="font-bold text-xs text-foreground/80">EMAIL ADDRESS</Label>
+                <Label htmlFor="email" className="font-bold text-xs text-foreground/80">
+                  EMAIL ADDRESS
+                </Label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -114,7 +142,9 @@ function LoginPage() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="font-bold text-xs text-foreground/80">PASSWORD</Label>
+                  <Label htmlFor="password" className="font-bold text-xs text-foreground/80">
+                    PASSWORD
+                  </Label>
                 </div>
                 <div className="relative">
                   <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -144,7 +174,9 @@ function LoginPage() {
                 <span className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-3 text-muted-foreground font-bold text-[10px] tracking-wider">DEMO QUICK LOGINS</span>
+                <span className="bg-card px-3 text-muted-foreground font-bold text-[10px] tracking-wider">
+                  DEMO QUICK LOGINS
+                </span>
               </div>
             </div>
 
@@ -169,7 +201,10 @@ function LoginPage() {
           </CardContent>
           <CardFooter className="flex flex-wrap items-center justify-center gap-1 border-t border-border/60 bg-secondary/15 py-4">
             <span className="text-xs text-muted-foreground">Don't have an account?</span>
-            <Link to="/register" className="text-xs font-bold text-forest hover:text-forest-deep underline">
+            <Link
+              to="/register"
+              className="text-xs font-bold text-forest hover:text-forest-deep underline"
+            >
               Register Now
             </Link>
           </CardFooter>

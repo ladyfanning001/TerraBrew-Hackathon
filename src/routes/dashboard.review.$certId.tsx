@@ -4,9 +4,19 @@ import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getPendingCertifications, validateCertification } from "@/lib/auth-server";
 import { toast } from "sonner";
-import { 
-  ShieldCheck, Award, Check, X, AlertCircle, Leaf, Flame,
-  MessageSquare, Camera, Trash2, ArrowLeft, Save
+import {
+  ShieldCheck,
+  Award,
+  Check,
+  X,
+  AlertCircle,
+  Leaf,
+  Flame,
+  MessageSquare,
+  Camera,
+  Trash2,
+  ArrowLeft,
+  Save,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -86,7 +96,7 @@ function ReviewPage() {
     },
     onError: (err: any) => {
       toast.error("Connection error: " + err.message);
-    }
+    },
   });
 
   const handleAction = (status: "approved" | "rejected") => {
@@ -107,8 +117,8 @@ function ReviewPage() {
         validatorId: user.id,
         status,
         feedback,
-        validatorPhoto: photo || undefined
-      }
+        validatorPhoto: photo || undefined,
+      },
     });
   };
 
@@ -150,9 +160,9 @@ function ReviewPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Back Button */}
-      <Button 
-        onClick={() => navigate({ to: "/dashboard/validate" })} 
-        variant="ghost" 
+      <Button
+        onClick={() => navigate({ to: "/dashboard/validate" })}
+        variant="ghost"
         className="gap-2 text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" /> Back to Validation List
@@ -163,11 +173,9 @@ function ReviewPage() {
         <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-honey font-bold">
           <ShieldCheck className="h-4 w-4" /> SEA Auditing Portal
         </div>
-        <h1 className="text-3xl font-bold text-primary">
-          Review & Validate Certification
-        </h1>
+        <h1 className="text-3xl font-bold text-primary">Review & Validate Certification</h1>
         <p className="text-sm text-muted-foreground">
-          Farmer: <span className="font-bold text-foreground">{selectedCert.farmer_name}</span> · 
+          Farmer: <span className="font-bold text-foreground">{selectedCert.farmer_name}</span> ·
           Farm: <span className="font-bold text-foreground">{selectedCert.farm_name}</span>
         </p>
       </div>
@@ -189,19 +197,21 @@ function ReviewPage() {
               <div className="text-3xl font-extrabold text-forest mt-2">
                 {Number(selectedCert.ecoscore).toFixed(2)}
               </div>
-              <Badge 
-                variant="outline" 
+              <Badge
+                variant="outline"
                 className={`mt-2 rounded-full border-transparent font-bold text-[10px] w-full justify-center ${
-                  Number(selectedCert.ecoscore) >= 0.66 ? "text-[#10b981] bg-[#10b981]/15" :
-                  Number(selectedCert.ecoscore) >= 0.33 ? "text-[#f59e0b] bg-[#f59e0b]/15" :
-                  "text-[#ef4444] bg-[#ef4444]/15"
+                  Number(selectedCert.ecoscore) >= 0.66
+                    ? "text-[#10b981] bg-[#10b981]/15"
+                    : Number(selectedCert.ecoscore) >= 0.33
+                      ? "text-[#f59e0b] bg-[#f59e0b]/15"
+                      : "text-[#ef4444] bg-[#ef4444]/15"
                 }`}
               >
-                {
-                  Number(selectedCert.ecoscore) >= 0.66 ? "High" :
-                  Number(selectedCert.ecoscore) >= 0.33 ? "Medium" :
-                  "Low"
-                }
+                {Number(selectedCert.ecoscore) >= 0.66
+                  ? "High"
+                  : Number(selectedCert.ecoscore) >= 0.33
+                    ? "Medium"
+                    : "Low"}
               </Badge>
             </div>
 
@@ -241,20 +251,54 @@ function ReviewPage() {
         <Card className="rounded-2xl border-border shadow-[var(--shadow-soft)]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold text-green-700 dark:text-green-300 flex items-center gap-2 uppercase">
-              <Leaf className="h-4 w-4" /> Pillar 1: Environmental ({Number(selectedCert.env_score).toFixed(2)}/1.00)
+              <Leaf className="h-4 w-4" /> Pillar 1: Environmental (
+              {Number(selectedCert.env_score).toFixed(2)}/1.00)
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-xs">
             <div className="grid grid-cols-3 gap-2 bg-secondary/10 p-3 rounded-lg border border-border/40">
-              <div>Temp: <span className="font-bold">{Number(selectedCert.env_suhu || 25).toFixed(1)}°C</span></div>
-              <div>Humidity: <span className="font-bold">{Number(selectedCert.env_rh || 70).toFixed(1)}%</span></div>
-              <div>Rainfall: <span className="font-bold">{Number(selectedCert.env_curah_hujan || 30).toFixed(1)}mm/day</span></div>
+              <div>
+                Temp:{" "}
+                <span className="font-bold">
+                  {Number(selectedCert.env_suhu || 25).toFixed(1)}°C
+                </span>
+              </div>
+              <div>
+                Humidity:{" "}
+                <span className="font-bold">{Number(selectedCert.env_rh || 70).toFixed(1)}%</span>
+              </div>
+              <div>
+                Rainfall:{" "}
+                <span className="font-bold">
+                  {Number(selectedCert.env_curah_hujan || 30).toFixed(1)}mm/day
+                </span>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div>Climate Suitability: <span className="font-bold">{Number(selectedCert.env_kesesuaian) === 1 ? "✓ Suitable" : "✗ Unsuitable"}</span></div>
-              <div>Processing Method: <span className="font-bold">{Number(selectedCert.env_metode) === 1 ? "Honey/Natural" : "Washed"}</span></div>
-              <div>Clean Energy: <span className="font-bold">{Number(selectedCert.env_energi) === 1 ? "✓ Renewable" : "✗ Fossil"}</span></div>
-              <div>Low Pesticide: <span className="font-bold">{Number(selectedCert.env_pestisida) === 1 ? "✓ Organic" : "✗ Chemicals"}</span></div>
+              <div>
+                Climate Suitability:{" "}
+                <span className="font-bold">
+                  {Number(selectedCert.env_kesesuaian) === 1 ? "✓ Suitable" : "✗ Unsuitable"}
+                </span>
+              </div>
+              <div>
+                Processing Method:{" "}
+                <span className="font-bold">
+                  {Number(selectedCert.env_metode) === 1 ? "Honey/Natural" : "Washed"}
+                </span>
+              </div>
+              <div>
+                Clean Energy:{" "}
+                <span className="font-bold">
+                  {Number(selectedCert.env_energi) === 1 ? "✓ Renewable" : "✗ Fossil"}
+                </span>
+              </div>
+              <div>
+                Low Pesticide:{" "}
+                <span className="font-bold">
+                  {Number(selectedCert.env_pestisida) === 1 ? "✓ Organic" : "✗ Chemicals"}
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -263,18 +307,44 @@ function ReviewPage() {
         <Card className="rounded-2xl border-border shadow-[var(--shadow-soft)]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold text-amber-700 dark:text-amber-300 flex items-center gap-2 uppercase">
-              <Flame className="h-4 w-4" /> Pillar 2: Economic ({Number(selectedCert.eco_score).toFixed(2)}/1.00)
+              <Flame className="h-4 w-4" /> Pillar 2: Economic (
+              {Number(selectedCert.eco_score).toFixed(2)}/1.00)
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-xs">
             <div className="grid grid-cols-3 gap-2 bg-secondary/10 p-3 rounded-lg border border-border/40">
-              <div className="col-span-3">Income: <span className="font-bold">Rp {Number(selectedCert.eco_pendapatan || 0).toLocaleString("id-ID")}/year</span></div>
-              <div>Acreage: <span className="font-bold">{Number(selectedCert.eco_luas_lahan || 0).toFixed(1)} ha</span></div>
-              <div>Productivity: <span className="font-bold">{Number(selectedCert.eco_produksi || 0).toFixed(1)} ton/ha/year</span></div>
+              <div className="col-span-3">
+                Income:{" "}
+                <span className="font-bold">
+                  Rp {Number(selectedCert.eco_pendapatan || 0).toLocaleString("id-ID")}/year
+                </span>
+              </div>
+              <div>
+                Acreage:{" "}
+                <span className="font-bold">
+                  {Number(selectedCert.eco_luas_lahan || 0).toFixed(1)} ha
+                </span>
+              </div>
+              <div>
+                Productivity:{" "}
+                <span className="font-bold">
+                  {Number(selectedCert.eco_produksi || 0).toFixed(1)} ton/ha/year
+                </span>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div>Quality: <span className="font-bold">{Number(selectedCert.eco_kualitas) === 1 ? "✓ Specialty" : "Standard"}</span></div>
-              <div>Financial Credit: <span className="font-bold">{Number(selectedCert.eco_kredit) === 1 ? "✓ Has Access" : "✗ No Access"}</span></div>
+              <div>
+                Quality:{" "}
+                <span className="font-bold">
+                  {Number(selectedCert.eco_kualitas) === 1 ? "✓ Specialty" : "Standard"}
+                </span>
+              </div>
+              <div>
+                Financial Credit:{" "}
+                <span className="font-bold">
+                  {Number(selectedCert.eco_kredit) === 1 ? "✓ Has Access" : "✗ No Access"}
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -283,15 +353,36 @@ function ReviewPage() {
         <Card className="rounded-2xl border-border shadow-[var(--shadow-soft)]">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-bold text-blue-700 dark:text-blue-300 flex items-center gap-2 uppercase">
-              <ShieldCheck className="h-4 w-4" /> Pillar 3: Social ({Number(selectedCert.sos_score).toFixed(2)}/1.00)
+              <ShieldCheck className="h-4 w-4" /> Pillar 3: Social (
+              {Number(selectedCert.sos_score).toFixed(2)}/1.00)
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-xs">
             <div className="grid grid-cols-2 gap-3">
-              <div>Group Participation: <span className="font-bold">{Number(selectedCert.sos_kelompok) === 1 ? "✓ Active" : "✗ Inactive"}</span></div>
-              <div>Gender Rights: <span className="font-bold">{Number(selectedCert.sos_gender) === 1 ? "✓ Equal" : "✗ Not Equal"}</span></div>
-              <div>Education & Safety: <span className="font-bold">{Number(selectedCert.sos_pendidikan) === 1 ? "✓ High School+" : "Primary"}</span></div>
-              <div>Mobile Phone: <span className="font-bold">{Number(selectedCert.sos_hp) === 1 ? "✓ Has Access" : "✗ No Access"}</span></div>
+              <div>
+                Group Participation:{" "}
+                <span className="font-bold">
+                  {Number(selectedCert.sos_kelompok) === 1 ? "✓ Active" : "✗ Inactive"}
+                </span>
+              </div>
+              <div>
+                Gender Rights:{" "}
+                <span className="font-bold">
+                  {Number(selectedCert.sos_gender) === 1 ? "✓ Equal" : "✗ Not Equal"}
+                </span>
+              </div>
+              <div>
+                Education & Safety:{" "}
+                <span className="font-bold">
+                  {Number(selectedCert.sos_pendidikan) === 1 ? "✓ High School+" : "Primary"}
+                </span>
+              </div>
+              <div>
+                Mobile Phone:{" "}
+                <span className="font-bold">
+                  {Number(selectedCert.sos_hp) === 1 ? "✓ Has Access" : "✗ No Access"}
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -301,9 +392,7 @@ function ReviewPage() {
       <Card className="rounded-2xl border-border shadow-[var(--shadow-soft)]">
         <CardHeader className="bg-secondary/20 border-b border-border/40">
           <CardTitle className="text-primary font-bold">SEA Validator Decision Form</CardTitle>
-          <CardDescription>
-            Provide detailed feedback and make your final decision
-          </CardDescription>
+          <CardDescription>Provide detailed feedback and make your final decision</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
           {/* Validator Feedback */}
@@ -312,15 +401,13 @@ function ReviewPage() {
               <MessageSquare className="h-4 w-4 text-forest" />
               Validator Feedback & Review (Required)
             </Label>
-            <Textarea 
+            <Textarea
               placeholder="Enter detailed farm evaluation, suggestions for sustainability improvements, or reasons for approval/rejection..."
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
               className="min-h-[120px] border-border/80 focus-visible:ring-forest bg-secondary/10 rounded-xl text-xs"
             />
-            <p className="text-[10px] text-muted-foreground">
-              {feedback.length} characters
-            </p>
+            <p className="text-[10px] text-muted-foreground">{feedback.length} characters</p>
           </div>
 
           {/* Audit Photo */}
@@ -329,14 +416,14 @@ function ReviewPage() {
               <Camera className="h-4 w-4 text-forest" />
               On-Site Audit Proof Photo (Required for Approval)
             </Label>
-            
+
             {photo ? (
               <div className="relative rounded-2xl overflow-hidden border border-border/80 aspect-video max-w-sm mx-auto shadow-sm group">
                 <img src={photo} alt="Audit proof preview" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Button 
-                    variant="destructive" 
-                    size="sm" 
+                  <Button
+                    variant="destructive"
+                    size="sm"
                     onClick={() => setPhoto(null)}
                     className="rounded-xl font-bold text-xs"
                   >
@@ -346,16 +433,20 @@ function ReviewPage() {
               </div>
             ) : (
               <div className="border-2 border-dashed border-border/80 hover:border-forest/60 bg-secondary/10 rounded-2xl p-8 text-center transition cursor-pointer relative">
-                <input 
-                  type="file" 
-                  accept="image/*" 
+                <input
+                  type="file"
+                  accept="image/*"
                   capture="environment"
                   onChange={handlePhotoChange}
                   className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                 />
                 <Camera className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-xs font-bold text-foreground">Click to Take or Upload Proof Photo</p>
-                <p className="text-[10px] text-muted-foreground mt-1">Camera will activate on mobile devices (Max 2MB)</p>
+                <p className="text-xs font-bold text-foreground">
+                  Click to Take or Upload Proof Photo
+                </p>
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Camera will activate on mobile devices (Max 2MB)
+                </p>
               </div>
             )}
           </div>
@@ -364,24 +455,24 @@ function ReviewPage() {
 
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-3 pt-4">
-        <Button 
-          onClick={() => navigate({ to: "/dashboard/validate" })} 
-          variant="outline" 
+        <Button
+          onClick={() => navigate({ to: "/dashboard/validate" })}
+          variant="outline"
           className="text-muted-foreground hover:text-foreground"
         >
           Cancel
         </Button>
         <div className="flex gap-2 ml-auto">
-          <Button 
-            onClick={() => handleAction("rejected")} 
+          <Button
+            onClick={() => handleAction("rejected")}
             disabled={validateMutation.isPending || !feedback.trim()}
-            variant="outline" 
+            variant="outline"
             className="border-destructive/40 text-destructive hover:bg-destructive/5 hover:text-destructive rounded-xl font-bold"
           >
             <X className="mr-1.5 h-4 w-4" /> Reject Application
           </Button>
-          <Button 
-            onClick={() => handleAction("approved")} 
+          <Button
+            onClick={() => handleAction("approved")}
             disabled={validateMutation.isPending || !feedback.trim() || !photo}
             className="bg-forest text-cream hover:bg-forest-deep rounded-xl font-bold"
           >
