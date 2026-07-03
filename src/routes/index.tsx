@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import heroImg from "@/assets/hero-coffee.jpg";
+import logoImg from "@/assets/Logo TerraBrew.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -53,10 +54,9 @@ function Landing() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <Link to="/" className="flex items-center gap-2">
             <div
-              className="flex h-9 w-9 items-center justify-center rounded-xl text-cream animate-pulse"
-              style={{ background: "var(--gradient-eco)" }}
+              className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-background border border-border/40"
             >
-              <Coffee className="h-5 w-5" />
+              <img src={logoImg} className="h-7 w-7 object-contain" alt="TerraBrew Logo" />
             </div>
             <div className="leading-tight">
               <div className="text-sm font-bold tracking-tight text-foreground">TerraBrew</div>

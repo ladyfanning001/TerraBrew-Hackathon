@@ -17,7 +17,7 @@ export function TerryChatbot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "model",
-      content: "Hello! I am **Terry**, your TerraBrew AI Assistant. ☕💚\n\nI can help you determine the best processing methods for your coffee, explain the Ecoscore pillars, or guide you through the SEA certification process. What would you like to know today?"
+      content: "Hello! I am **TerraAI**, your TerraBrew AI Assistant. ☕💚\n\nI can help you determine the best processing methods for your coffee, explain the Ecoscore pillars, or guide you through the SEA certification process. What would you like to know today?"
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
@@ -153,7 +153,7 @@ export function TerryChatbot() {
       if (res.success && res.text) {
         setMessages((prev) => [...prev, { role: "model", content: res.text }]);
       } else {
-        toast.error("Failed to get response from Terry: " + res.error);
+        toast.error("Failed to get response from TerraAI: " + res.error);
         setMessages((prev) => [
           ...prev,
           {
@@ -207,7 +207,7 @@ export function TerryChatbot() {
               </div>
               <div>
                 <CardTitle className="text-sm font-bold text-primary flex items-center gap-1">
-                  Terry
+                  TerraAI
                   <Sparkles className="h-3 w-3 text-honey animate-pulse" />
                 </CardTitle>
                 <CardDescription className="text-[10px] font-medium text-forest">TerraBrew Smart Assistant</CardDescription>
@@ -296,7 +296,7 @@ export function TerryChatbot() {
           {/* Input Footer */}
           <CardFooter className="p-3 border-t border-border/40 bg-background/50 backdrop-blur-sm flex gap-2">
             <Input 
-              placeholder="Ask Terry anything about coffee..."
+              placeholder="Ask TerraAI anything about coffee..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}

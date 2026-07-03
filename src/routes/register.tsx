@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import logoImg from "@/assets/Logo TerraBrew.png";
 
 export const Route = createFileRoute("/register")({
   head: () => ({
@@ -87,8 +88,8 @@ function RegisterPage() {
       <div className="w-full max-w-md space-y-6 relative z-10">
         <div className="text-center">
           <Link to="/" className="inline-flex items-center gap-2 mb-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl text-cream" style={{ background: "var(--gradient-eco)" }}>
-              <Coffee className="h-5 w-5" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl overflow-hidden bg-background border border-border/40">
+              <img src={logoImg} className="h-8 w-8 object-contain" alt="TerraBrew Logo" />
             </div>
             <span className="text-xl font-bold tracking-tight text-foreground">TerraBrew</span>
           </Link>

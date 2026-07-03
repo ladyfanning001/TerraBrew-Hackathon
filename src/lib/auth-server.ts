@@ -437,10 +437,11 @@ export const getFarmerCertifications = createServerFn({ method: "GET" })
     }
   });
 
-// 7. GET ALL PENDING CERTIFICATIONS (For SEA)
+// 7. GET ALL CERTIFICATIONS BY STATUS (For SEA)
 export const getPendingCertifications = createServerFn({ method: "GET" })
-  .validator((d: { validatorId: number; allRegions?: boolean }) => d)
+  .validator((d: { validatorId: number; allRegions?: boolean; status?: "pending" | "approved" | "rejected" }) => d)
   .handler(async ({ data }) => {
+    const status = data.status || 'pending';
     const db = await getDb();
     if (!db) {
       // Mock validation filter (uses Aceh, Indonesia as standard mockup validator location)
@@ -449,7 +450,7 @@ export const getPendingCertifications = createServerFn({ method: "GET" })
 
       return mockCertifications
         .filter(c => 
-          c.status === 'pending' && 
+          c.status === status && 
           (data.allRegions || (
             c.country?.toLowerCase() === valCountry.toLowerCase() && 
             c.region?.toLowerCase() === valRegion.toLowerCase()
@@ -464,7 +465,7 @@ export const getPendingCertifications = createServerFn({ method: "GET" })
           SELECT c.*, f.full_name as "farmer_name", f.email as "farmer_email"
           FROM certifications c
           JOIN profiles f ON c.farmer_id = f.id
-          WHERE c.status = 'pending'
+          WHERE c.status = ${status}
           ORDER BY c.created_at ASC
         `;
         return rows;
@@ -483,14 +484,14 @@ export const getPendingCertifications = createServerFn({ method: "GET" })
         SELECT c.*, f.full_name as "farmer_name", f.email as "farmer_email"
         FROM certifications c
         JOIN profiles f ON c.farmer_id = f.id
-        WHERE c.status = 'pending'
+        WHERE c.status = ${status}
           AND LOWER(c.country) = LOWER(${valCountry})
           AND LOWER(c.region) = LOWER(${valRegion})
         ORDER BY c.created_at ASC
       `;
       return rows;
     } catch (error) {
-      console.error("Get Pending Certifications Error:", error);
+      console.error("Get Certifications Error:", error);
       return [];
     }
   });
@@ -553,7 +554,7 @@ export const askTerryChatbot = createServerFn({ method: "POST" })
 
     const systemInstruction = {
       parts: [{
-        text: "You are Terry, a friendly, professional, and helpful AI assistant for TerraBrew. " +
+        text: "You are TerraAI, a friendly, professional, and helpful AI assistant for TerraBrew. " +
               "TerraBrew is a web platform for smart coffee post-harvest processing (recommending washed, natural, honey, wine, and semi-washed methods based on weather parameters like temperature, relative humidity, and rainfall) and specialty coffee Ecoscore certifications (evaluating environmental, economic, and social sustainability pillars on a 0.00-1.00 scale validated by the SEA). " +
               "Keep your answers concise, engaging, and highly knowledgeable about coffee processing chemistry, fermentation, drying guidelines, and the platform's Ecoscore requirements (low < 0.33, medium 0.33-0.66, high >= 0.66). " +
               "Help farmers optimize their post-harvest processes to increase coffee quality and guide validators in reviewing audits."

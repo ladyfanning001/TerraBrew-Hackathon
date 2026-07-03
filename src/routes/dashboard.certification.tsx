@@ -328,7 +328,7 @@ function CertificationPage() {
 
                   {/* env_metode */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold">PROCESSING METHOD (env_metode)</Label>
+                    <Label className="text-xs font-bold">PROCESSING METHOD</Label>
                     <div className="flex gap-2">
                       <Button 
                         type="button" 
@@ -351,7 +351,7 @@ function CertificationPage() {
 
                   {/* env_kesesuaian */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold">METHOD CLIMATE SUITABILITY (env_kesesuaian)</Label>
+                    <Label className="text-xs font-bold">METHOD CLIMATE SUITABILITY</Label>
                     <div className="flex items-center gap-3 bg-secondary/15 border border-border p-3.5 rounded-xl">
                       {envKesesuaian === 1 ? (
                         <Badge className="bg-forest/15 text-forest border-transparent rounded-full px-3 py-1 font-bold">
@@ -372,7 +372,7 @@ function CertificationPage() {
 
                   {/* env_energi */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold">ENERGY TYPE (env_energi)</Label>
+                    <Label className="text-xs font-bold">ENERGY TYPE</Label>
                     <div className="flex gap-2">
                       <Button 
                         type="button" 
@@ -395,7 +395,7 @@ function CertificationPage() {
 
                   {/* env_pestisida */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold">PESTICIDE USAGE (env_pestisida)</Label>
+                    <Label className="text-xs font-bold">PESTICIDE USAGE</Label>
                     <div className="flex gap-2">
                       <Button 
                         type="button" 
@@ -418,7 +418,7 @@ function CertificationPage() {
 
                   {/* env_konservasi */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold">SOIL CONSERVATION (env_konservasi)</Label>
+                    <Label className="text-xs font-bold">SOIL CONSERVATION</Label>
                     <div className="flex gap-2">
                       <Button 
                         type="button" 
@@ -460,7 +460,7 @@ function CertificationPage() {
                 <div className="space-y-6">
                   {/* eco_kualitas */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold">COFFEE QUALITY (eco_kualitas, REQUIRED)</Label>
+                    <Label className="text-xs font-bold">COFFEE QUALITY</Label>
                     <div className="flex gap-2">
                       <Button 
                         type="button" 
@@ -542,7 +542,7 @@ function CertificationPage() {
 
                   {/* eco_kredit */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold">BANK CREDIT / KUR ACCESS (eco_kredit)</Label>
+                    <Label className="text-xs font-bold">BANK CREDIT / KUR ACCESS</Label>
                     <div className="flex gap-2">
                       <Button 
                         type="button" 
@@ -584,7 +584,7 @@ function CertificationPage() {
                 <div className="space-y-6">
                   {/* sos_kelompok */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold">COOPERATIVE / FARMER GROUP ACTIVE (sos_kelompok, REQUIRED)</Label>
+                    <Label className="text-xs font-bold">COOPERATIVE / FARMER GROUP ACTIVE</Label>
                     <div className="flex gap-2">
                       <Button 
                         type="button" 
@@ -607,7 +607,7 @@ function CertificationPage() {
 
                   {/* sos_gender */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold">GENDER EQUALITY & INCLUSION (sos_gender)</Label>
+                    <Label className="text-xs font-bold">GENDER EQUALITY & INCLUSION</Label>
                     <div className="flex gap-2">
                       <Button 
                         type="button" 
@@ -630,7 +630,7 @@ function CertificationPage() {
 
                   {/* sos_pendidikan */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold">FARMER EDUCATION LEVEL (sos_pendidikan)</Label>
+                    <Label className="text-xs font-bold">FARMER EDUCATION LEVEL</Label>
                     <div className="flex gap-2">
                       <Button 
                         type="button" 
@@ -653,7 +653,7 @@ function CertificationPage() {
 
                   {/* sos_hp */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-bold">MOBILE PHONE & SIGNAL ACCESS (sos_hp)</Label>
+                    <Label className="text-xs font-bold">MOBILE PHONE & SIGNAL ACCESS</Label>
                     <div className="flex gap-2">
                       <Button 
                         type="button" 
@@ -680,7 +680,7 @@ function CertificationPage() {
                   {/* sos_internet */}
                   <div className="space-y-2">
                     <Label className="text-xs font-bold flex justify-between">
-                      <span>INTERNET ACCESS (sos_internet)</span>
+                      <span>INTERNET ACCESS</span>
                       {sosHp === 0 && <span className="text-[10px] text-destructive font-semibold">Requires Phone/Signal Access</span>}
                     </Label>
                     <div className="flex gap-2">

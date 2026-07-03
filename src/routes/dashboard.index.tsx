@@ -284,6 +284,9 @@ function DashboardHome() {
   // Coffee Grade input state (restored)
   const [grade, setGrade] = useState("A");
 
+  // Batch weight state for waste calculation
+  const [batchWeight, setBatchWeight] = useState<number>(1000);
+
   const [hasCalculated, setHasCalculated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
@@ -538,15 +541,102 @@ function DashboardHome() {
     const selected = topKey;
 
     if (temp > 45) return "Thermal damage (Aroma flattening, roasted defect, low acidity)";
-    if (h > 70) return "Risiko mold & acidity defect (High BOD/COD in waste)";
+    if (h > 70) return "Risk of mold & acidity defect (High BOD/COD in wastewater)";
     if (fd > 96 && selected !== "wine") return "Over-fermentation risk (Vinegar defect, off-flavors)";
     
-    if (temp >= 20 && temp <= 30 && h >= 50 && h <= 55) return "Specialty potential tinggi (Stable metabolits)";
-    if (selected === "natural" && h < 60 && r < 15) return "Fruity sweetness tinggi (Intense fruitiness)";
-    if (selected === "honey" && h >= 50 && h <= 65) return "Body & sweetness meningkat";
+    if (temp >= 20 && temp <= 30 && h >= 50 && h <= 55) return "High specialty potential (Stable metabolites)";
+    if (selected === "natural" && h < 60 && r < 15) return "High fruity sweetness (Intense fruitiness)";
+    if (selected === "honey" && h >= 50 && h <= 65) return "Increased body & sweetness";
     
-    return "Flavor profile standar berdasarkan process type";
+    return "Standard flavor profile based on process type";
   }, [humidity, temperature, rainfall, topKey, fermentationDuration]);
+
+  const processComparisons = useMemo(() => {
+    const h = humidity[0];
+    const r = rainfall[0];
+    const temp = temperature[0];
+    const w = Math.min(100, Math.max(10, 100 - (h * 0.4) + (r * 1.5)));
+
+    return Object.entries(METHOD_DETAILS).map(([key, meta]) => {
+      let feasibility = "Safe";
+      let feasibilityClass = "bg-emerald-500/10 text-emerald-700 border-emerald-500/20";
+      let logic = "Suitable for current environment.";
+      let leaves = "🌿";
+
+      if (key === "washed") {
+        leaves = "🌿";
+        if (w < 30) {
+          feasibility = "Not Recommended";
+          feasibilityClass = "bg-rose-500/10 text-rose-700 border-rose-500/20";
+          logic = "Extremely high water demand. Insufficient local water resource.";
+        } else if (r > 20 && h > 65) {
+          feasibility = "Best Choice";
+          feasibilityClass = "bg-emerald-500/10 text-emerald-700 border-emerald-500/20 font-extrabold";
+          logic = "Wet environment protects process from drying mold contamination.";
+        } else {
+          feasibility = "Feasible";
+          feasibilityClass = "bg-amber-500/10 text-amber-700 border-amber-500/20";
+          logic = "Feasible but consumes excessive water resources.";
+        }
+      } else if (key === "semi_washed") {
+        leaves = "🌿🌿🌿";
+        if (w < 20) {
+          feasibility = "Not Recommended";
+          feasibilityClass = "bg-rose-500/10 text-rose-700 border-rose-500/20";
+          logic = "Insufficient water availability even for semi-washed process.";
+        } else {
+          feasibility = "Recommended";
+          feasibilityClass = "bg-emerald-500/10 text-emerald-700 border-emerald-500/20";
+          logic = "Balanced water usage and well-suited for humid climates.";
+        }
+      } else if (key === "honey") {
+        leaves = "🌿🌿🌿🌿";
+        if (h > 70) {
+          feasibility = "Risky";
+          feasibilityClass = "bg-rose-500/10 text-rose-700 border-rose-500/20";
+          logic = "High relative humidity (>70%) makes sticky mucilage prone to fungal rot.";
+        } else {
+          feasibility = "Recommended";
+          feasibilityClass = "bg-emerald-500/10 text-emerald-700 border-emerald-500/20";
+          logic = "Saves water. Stable relative humidity allows safe drying of mucilage.";
+        }
+      } else if (key === "wine") {
+        leaves = "🌿🌿🌿🌿🌿";
+        if (temp > 30) {
+          feasibility = "Risky";
+          feasibilityClass = "bg-amber-500/10 text-amber-700 border-amber-500/20";
+          logic = "High temperatures (>30°C) degrade anaerobic fermentation microbes.";
+        } else {
+          feasibility = "Recommended";
+          feasibilityClass = "bg-emerald-500/10 text-emerald-700 border-emerald-500/20";
+          logic = "Controlled anaerobic fermentation prevents ambient mold defects.";
+        }
+      } else if (key === "natural") {
+        leaves = "🌿🌿🌿🌿🌿";
+        if (h > 70 || r > 15) {
+          feasibility = "Critical Risk";
+          feasibilityClass = "bg-rose-500/10 text-rose-700 border-rose-500/20 font-extrabold";
+          logic = "Rain or high humidity (>70%) triggers heavy mold & black bean defects.";
+        } else {
+          feasibility = "Highly Recommended";
+          feasibilityClass = "bg-emerald-500/10 text-emerald-700 border-emerald-500/20 font-extrabold";
+          logic = "Zero-water process. Dry, low-humidity conditions promote fast sun-drying.";
+        }
+      }
+
+      return {
+        key,
+        name: meta.name.split(" (")[0],
+        color: meta.color,
+        waterLiters: meta.waterLiters,
+        ecoScore: meta.ecoScore,
+        feasibility,
+        feasibilityClass,
+        logic,
+        leaves,
+      };
+    });
+  }, [humidity, rainfall, temperature]);
 
   // Recharts Charting Data
   const radarData = useMemo(() => {
@@ -583,7 +673,7 @@ function DashboardHome() {
       alertList.push({
         level: "danger",
         title: "Mold growth risk",
-        desc: `RH >70% detected (${h}%). High risk of fungal growth. Solution: Tingkatkan ventilasi.`,
+        desc: `RH >70% detected (${h}%). High risk of fungal growth. Solution: Increase ventilation.`,
       });
     }
 
@@ -591,7 +681,7 @@ function DashboardHome() {
       alertList.push({
         level: "warning",
         title: "Rewetting risk",
-        desc: `Rainfall detected (${r} mm/day). Risk of kapang & biji busuk. Solution: Tutup dryer.`,
+        desc: `Rainfall detected (${r} mm/day). Risk of mold & rotten beans. Solution: Close dryer.`,
       });
     }
 
@@ -599,7 +689,7 @@ function DashboardHome() {
       alertList.push({
         level: "danger",
         title: "Overdrying / Thermal damage",
-        desc: `Temp >35°C detected (${temp}°C). High risk of aroma flattening and roasted defects. Solution: Turunkan suhu.`,
+        desc: `Temp >35°C detected (${temp}°C). High risk of aroma flattening and roasted defects. Solution: Lower temperature.`,
       });
     }
 
@@ -615,7 +705,7 @@ function DashboardHome() {
       alertList.push({
         level: "danger",
         title: "Over-fermentation Risk",
-        desc: `Duration ${fd}h is too long for standard processing. Stop fermentasi immediately or risk vinegar defects.`,
+        desc: `Duration ${fd}h is too long for standard processing. Stop fermentation immediately or risk vinegar defects.`,
       });
     }
 
@@ -638,13 +728,13 @@ function DashboardHome() {
     const r = rainfall[0];
     const wS = windSpeed[0];
 
-    if (r > 15) return { status: "Rewetting risk", action: "Tutup solar dryer" };
+    if (r > 15) return { status: "Rewetting risk", action: "Close solar dryer" };
     if (h > 70) {
-       if (wS > 15) return { status: "Risiko tinggi (Mitigated by Wind)", action: "Lanjutkan ventilasi alami, monitor RH" };
-       return { status: "Risiko tinggi", action: "Tutup dryer / aktifkan ventilasi mekanis" };
+       if (wS > 15) return { status: "High risk (Mitigated by Wind)", action: "Continue natural ventilation, monitor RH" };
+       return { status: "High risk", action: "Close dryer / activate mechanical ventilation" };
     }
-    if (temp > 35) return { status: "Overheating risk", action: "Turunkan airflow panas" };
-    if (temp >= 20 && temp <= 35 && h >= 50 && h <= 55) return { status: "Optimal", action: "Lanjut drying" };
+    if (temp > 35) return { status: "Overheating risk", action: "Reduce hot airflow" };
+    if (temp >= 20 && temp <= 35 && h >= 50 && h <= 55) return { status: "Optimal", action: "Continue drying" };
     
     return { status: "Monitoring Needed", action: "Continue parameter monitoring" };
   }, [humidity, temperature, rainfall, windSpeed]);
@@ -673,54 +763,76 @@ function DashboardHome() {
           <CardDescription>Enter values manually or sync them automatically by searching global locations or direct coordinates.</CardDescription>
         </CardHeader>
         <CardContent className="p-6 space-y-8">
-          {/* STEP 1: API / Location search with dropdown autocomplete */}
+          {/* STEP 1: Location Sync & Batch Setup */}
           <div className="space-y-4 pb-6 border-b border-border/60">
-            <div className="flex flex-col gap-2 relative" ref={searchContainerRef}>
-              <Label htmlFor="location-search" className="text-xs font-bold text-foreground">
-                📍 Global Weather Search (Geocoding API / Coordinate Input)
-              </Label>
-              <form onSubmit={handleManualSearch} className="flex gap-2">
-                <div className="relative flex-1">
-                  <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="location-search"
-                    placeholder="Enter city name OR coordinates 'lat, lng' (e.g. -8.24, 115.33)"
-                    value={locationInput}
-                    onChange={(e) => {
-                      setLocationInput(e.target.value);
-                      setShowSuggestions(true);
-                    }}
-                    onFocus={() => setShowSuggestions(true)}
-                    className="pl-9 border-border bg-secondary/30 focus-visible:bg-background text-xs"
-                  />
-                  {isGeocoding && (
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-accent animate-pulse font-semibold">
-                      Searching...
-                    </span>
-                  )}
-                </div>
-                <Button type="submit" disabled={isLoading} className="bg-forest text-cream hover:bg-forest-deep">
-                  <Search className="h-4 w-4 mr-1.5" />
-                  {isLoading ? "Syncing..." : "Sync Weather"}
-                </Button>
-              </form>
+            <div className="grid gap-4 md:grid-cols-3">
+              {/* Global search */}
+              <div className="md:col-span-2 flex flex-col gap-2 relative" ref={searchContainerRef}>
+                <Label htmlFor="location-search" className="text-xs font-bold text-foreground">
+                  📍 Global Weather Search (Geocoding API / Coordinate Input)
+                </Label>
+                <form onSubmit={handleManualSearch} className="flex gap-2">
+                  <div className="relative flex-1">
+                    <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="location-search"
+                      placeholder="Enter city name OR coordinates 'lat, lng' (e.g. -8.24, 115.33)"
+                      value={locationInput}
+                      onChange={(e) => {
+                        setLocationInput(e.target.value);
+                        setShowSuggestions(true);
+                      }}
+                      onFocus={() => setShowSuggestions(true)}
+                      className="pl-9 border-border bg-secondary/30 focus-visible:bg-background text-xs"
+                    />
+                    {isGeocoding && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-accent animate-pulse font-semibold">
+                        Searching...
+                      </span>
+                    )}
+                  </div>
+                  <Button type="submit" disabled={isLoading} className="bg-forest text-cream hover:bg-forest-deep text-xs font-bold px-4">
+                    <Search className="h-4 w-4 mr-1.5" />
+                    {isLoading ? "Syncing..." : "Sync Weather"}
+                  </Button>
+                </form>
 
-              {/* Autocomplete suggestions dropdown list */}
-              {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 rounded-xl border border-border bg-card shadow-lg max-h-60 overflow-y-auto divide-y divide-border/60">
-                  {suggestions.map((preset) => (
-                    <button
-                      key={preset.name + preset.lat + preset.lng}
-                      type="button"
-                      onClick={() => handleSelectLocation(preset)}
-                      className="w-full text-left px-4 py-2.5 text-xs hover:bg-secondary/40 transition-colors flex items-center justify-between"
-                    >
-                      <span className="font-bold text-foreground">{preset.name}</span>
-                      <span className="text-[10px] text-muted-foreground font-semibold">Elev: {preset.elevation} | Coord: {preset.lat}, {preset.lng}</span>
-                    </button>
-                  ))}
+                {/* Autocomplete suggestions dropdown list */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 rounded-xl border border-border bg-card shadow-lg max-h-60 overflow-y-auto divide-y divide-border/60">
+                    {suggestions.map((preset) => (
+                      <button
+                        key={preset.name + preset.lat + preset.lng}
+                        type="button"
+                        onClick={() => handleSelectLocation(preset)}
+                        className="w-full text-left px-4 py-2.5 text-xs hover:bg-secondary/40 transition-colors flex items-center justify-between"
+                      >
+                        <span className="font-bold text-foreground">{preset.name}</span>
+                        <span className="text-[10px] text-muted-foreground font-semibold">Elev: {preset.elevation} | Coord: {preset.lat}, {preset.lng}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Batch setup at first */}
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="batch-weight-input-top" className="text-xs font-bold text-foreground">
+                  📦 Batch Size / Harvest Weight (kg cherry)
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="batch-weight-input-top"
+                    type="number"
+                    value={batchWeight}
+                    onChange={(e) => setBatchWeight(Math.max(1, parseInt(e.target.value) || 0))}
+                    className="border-border bg-secondary/30 focus-visible:bg-background text-xs font-bold pr-12 h-10 rounded-xl"
+                  />
+                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-bold">
+                    kg
+                  </span>
                 </div>
-              )}
+              </div>
             </div>
 
             {/* Weather Verification & Confirmation Component */}
@@ -1015,6 +1127,162 @@ function DashboardHome() {
                     </div>
                   );
                 })}
+              </div>
+
+              {/* Sustainability & Waste Footprint Calculator */}
+              <div className="p-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 mt-6 space-y-6">
+                <div className="flex items-center gap-3 border-b border-emerald-500/10 pb-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
+                    <Leaf className="h-5 w-5 animate-pulse" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                      Sustainability & Waste Footprint Calculator
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      Waste estimations and environmental compatibility dashboard for batch size: <strong className="text-foreground">{batchWeight.toLocaleString()} kg</strong>.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-6 md:grid-cols-3">
+                  {/* Water footprint */}
+                  <div className="bg-card p-4 rounded-xl border border-border shadow-sm flex flex-col justify-between">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider flex items-center gap-1">
+                        <Droplets className="h-3.5 w-3.5 text-blue-500" /> Freshwater Consumed
+                      </span>
+                      <div className="text-2xl font-extrabold text-blue-600 mt-2">
+                        {(batchWeight * recommendedData.waterLiters).toLocaleString()} L
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-2">
+                      Total water needed to process this batch size.
+                    </p>
+                  </div>
+
+                  {/* Wastewater footprint */}
+                  <div className="bg-card p-4 rounded-xl border border-border shadow-sm flex flex-col justify-between">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider flex items-center gap-1">
+                        <Droplets className="h-3.5 w-3.5 text-emerald-500" /> Wastewater Generated
+                      </span>
+                      <div className="text-2xl font-extrabold text-emerald-600 mt-2">
+                        {recommendedData.name.includes("Washed") 
+                          ? `${(batchWeight * recommendedData.waterLiters * 0.85).toLocaleString()} L`
+                          : "0 L (Waterless)"}
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-2">
+                      Acidic effluent requiring eco-treatment ponds.
+                    </p>
+                  </div>
+
+                  {/* Solid waste */}
+                  <div className="bg-card p-4 rounded-xl border border-border shadow-sm flex flex-col justify-between">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider flex items-center gap-1">
+                        <Scale className="h-3.5 w-3.5 text-amber-600" /> Coffee Pulp/Husks Produced
+                      </span>
+                      <div className="text-2xl font-extrabold text-amber-700 mt-2">
+                        {(batchWeight * 0.40).toLocaleString()} kg
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-2">
+                      Wet skin/pulp representing ~40% of cherry weight.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Sustainability & Weather Compatibility Comparison Grid */}
+                <div className="border-t border-emerald-500/10 pt-6">
+                  <h4 className="text-xs font-bold text-foreground uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                    <Scale className="h-4 w-4 text-emerald-600" />
+                    Process Comparison: Sustainability vs. Climate Compatibility
+                  </h4>
+                  <div className="overflow-x-auto rounded-xl border border-border/80 shadow-sm bg-card">
+                    <table className="w-full text-xs text-left border-collapse">
+                      <thead>
+                        <tr className="bg-secondary/15 text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border">
+                          <th className="py-3 px-4 font-bold">Process Method</th>
+                          <th className="py-3 px-4 text-center font-bold">Eco rating</th>
+                          <th className="py-3 px-4 text-right font-bold">Water usage</th>
+                          <th className="py-3 px-4 text-center font-bold">Weather feasibility</th>
+                          <th className="py-3 px-4 font-bold">Agronomic Logic</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {processComparisons.map((item) => (
+                          <tr key={item.key} className={`border-b border-border/40 hover:bg-secondary/10 transition-colors ${item.key === topKey ? "bg-emerald-500/5 font-semibold" : ""}`}>
+                            <td className="py-3 px-4 flex items-center gap-2">
+                              <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                              <span>{item.name}</span>
+                              {item.key === topKey && (
+                                <Badge className="text-[9px] py-0 px-1.5 bg-emerald-500 text-cream hover:bg-emerald-500 border-transparent rounded">
+                                  Top Pick
+                                </Badge>
+                              )}
+                            </td>
+                            <td className="py-3 px-4 text-center tracking-wider">{item.leaves}</td>
+                            <td className="py-3 px-4 text-right font-bold text-foreground">{(batchWeight * item.waterLiters).toLocaleString()} L</td>
+                            <td className="py-3 px-4 text-center">
+                              <Badge className={`rounded text-[10px] font-bold py-0.5 px-2 border ${item.feasibilityClass}`}>
+                                {item.feasibility}
+                              </Badge>
+                            </td>
+                            <td className="py-3 px-4 text-muted-foreground text-[11px] leading-relaxed max-w-sm">{item.logic}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Sustainability rating & actions */}
+                <div className="grid gap-6 md:grid-cols-3 mt-6 border-t border-emerald-500/10 pt-6">
+                  <div className="space-y-2">
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">
+                      Sustainability Rating
+                    </span>
+                    <div className="flex gap-1 text-xl">
+                      {topKey === "natural" || topKey === "wine" ? (
+                        <>🌿🌿🌿🌿🌿 <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full ml-2">Eco-Excellent</span></>
+                      ) : topKey === "honey" ? (
+                        <>🌿🌿🌿🌿 <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full ml-2">Very High</span></>
+                      ) : topKey === "semi_washed" ? (
+                        <>🌿🌿🌿 <span className="text-xs font-bold text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded-full ml-2">Moderate</span></>
+                      ) : (
+                        <>🌿 <span className="text-xs font-bold text-rose-600 bg-rose-500/10 px-2 py-0.5 rounded-full ml-2">Low (Resource Intensive)</span></>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-muted-foreground leading-normal">
+                      Based on water footprint, chemical discharge, and energy requirements.
+                    </p>
+                  </div>
+
+                  <div className="md:col-span-2 space-y-2">
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">
+                      Waste Management Action Plan
+                    </span>
+                    <div className="bg-card p-3.5 rounded-xl border border-emerald-500/10 text-xs text-foreground font-medium leading-relaxed">
+                      {topKey === "washed" && (
+                        "Washed process produces heavy acidic wastewater (pH ~4.5) loaded with soluble sugars and pectins. It has a high Chemical Oxygen Demand (COD). Required Action: Run wastewater through a series of anaerobic/aerobic lagoons and apply agricultural lime to neutralize acidity before discharge. Solid pulp must be composted separately."
+                      )}
+                      {topKey === "semi_washed" && (
+                        "Semi-washed uses moderate water. Wastewater is acidic and rich in organic matter. Required Action: Divert washwater to a stabilization pond. Compost pulped mucilage and skin with farm manure to produce organic fertilizer."
+                      )}
+                      {topKey === "honey" && (
+                        "Honey process generates minimal wastewater since mucilage is left on the bean. Required Action: Zero wastewater discharge. Pulped skins must be immediately spread out to compost, preventing anaerobic rot and foul odors."
+                      )}
+                      {topKey === "wine" && (
+                        "Extended anaerobic whole coffee cherry process uses virtually no water, creating zero liquid waste. Required Action: Composting of whole dried cherries after hulling. High nutrient husks make excellent organic mulch."
+                      )}
+                      {topKey === "natural" && (
+                        "Natural process is completely waterless, yielding zero wastewater. Required Action: Recycle dried coffee husks (cascara) after hulling as high-potassium organic fertilizer or organic mulch for the coffee trees."
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Journal data accordions */}

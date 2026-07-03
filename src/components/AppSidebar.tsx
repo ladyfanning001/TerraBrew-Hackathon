@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   LogOut,
 } from "lucide-react";
+import logoImg from "@/assets/Logo TerraBrew.png";
 import {
   Sidebar,
   SidebarContent,
@@ -55,10 +56,9 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-2 px-2 py-3">
           <div
-            className="flex h-9 w-9 items-center justify-center rounded-xl"
-            style={{ background: "var(--gradient-eco)" }}
+            className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-background border border-border/40"
           >
-            <Coffee className="h-5 w-5 text-sidebar-primary-foreground" />
+            <img src={logoImg} className="h-7 w-7 object-contain" alt="TerraBrew Logo" />
           </div>
           <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
             <span className="text-sm font-semibold text-sidebar-foreground">
