@@ -95,11 +95,11 @@ function Landing() {
                         <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
                           {user.full_name
                             ? user.full_name
-                                .split(" ")
-                                .map((w: string) => w[0])
-                                .join("")
-                                .toUpperCase()
-                                .slice(0, 2)
+                              .split(" ")
+                              .map((w: string) => w[0])
+                              .join("")
+                              .toUpperCase()
+                              .slice(0, 2)
                             : "US"}
                         </AvatarFallback>
                       </Avatar>
@@ -171,12 +171,11 @@ function Landing() {
               AI for sustainable coffee post-harvesting
             </Badge>
             <h1 className="text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl text-primary">
-              Empowering Coffee Farmers, <span className="text-accent">Sustainably.</span>
+              Sustainability in every <span className="text-accent">bean.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              TerraBrew helps Indonesian smallholder farmers select the most sustainable coffee
-              preprocessing method — Washed, Semi-Washed, Honey, Wine, or Natural — by analyzing
-              real-time local weather, water availability, and crop characteristics.
+              TerraBrew helps smallholder farmers select the most sustainable coffee
+              preprocessing method by analyzing real-time local weather, water availability, and crop characteristics.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button
@@ -309,7 +308,7 @@ function Landing() {
                 Why TerraBrew?
               </Badge>
               <h2 className="mt-4 text-3xl font-bold md:text-4xl text-primary">
-                A Smarter Post-Harvest Pathway for Indonesian Coffee
+                A Smarter Post-Harvest Pathway for Coffee
               </h2>
               <p className="mt-4 text-muted-foreground leading-relaxed">
                 Traditional coffee processing relies heavily on intuition, leaving harvests

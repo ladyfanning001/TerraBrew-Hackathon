@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { getPendingCertifications } from "@/lib/auth-server";
+import { CertificateModal } from "@/components/CertificateModal";
 import { toast } from "sonner";
 import {
   ShieldCheck,
@@ -46,6 +47,7 @@ function ValidatePortal() {
   const [viewMode, setViewMode] = useState<"jurisdiction" | "all">("jurisdiction");
   const [statusFilter, setStatusFilter] = useState<"pending" | "approved" | "rejected">("pending");
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [selectedCert, setSelectedCert] = useState<any>(null);
 
   // Fetch pending certifications
   const { data: pendingList, isLoading: isPendingLoading } = useQuery({
@@ -327,7 +329,17 @@ function ValidatePortal() {
                             <ClipboardCheck className="mr-1 h-3.5 w-3.5" /> Review Audit
                           </Button>
                         ) : (
-                          <Dialog>
+                          <div className="flex justify-end gap-1.5">
+                            {statusFilter === "approved" && (
+                              <Button
+                                onClick={() => setSelectedCert(c)}
+                                size="sm"
+                                className="bg-forest text-cream hover:bg-forest-deep rounded-lg font-bold text-xs flex items-center gap-1"
+                              >
+                                <Award className="h-3.5 w-3.5" /> Certificate
+                              </Button>
+                            )}
+                            <Dialog>
                             <DialogTrigger asChild>
                               <Button
                                 size="sm"
@@ -399,6 +411,7 @@ function ValidatePortal() {
                               </div>
                             </DialogContent>
                           </Dialog>
+                          </div>
                         )}
                       </td>
                     </tr>
@@ -416,6 +429,11 @@ function ValidatePortal() {
           )}
         </CardContent>
       </Card>
+      <CertificateModal
+        isOpen={selectedCert !== null}
+        onClose={() => setSelectedCert(null)}
+        certification={selectedCert}
+      />
     </div>
   );
 }

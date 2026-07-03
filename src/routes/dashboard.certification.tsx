@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { submitCertification, getFarmerCertifications } from "@/lib/auth-server";
+import { CertificateModal } from "@/components/CertificateModal";
 import { toast } from "sonner";
 import {
   Award,
@@ -64,6 +65,7 @@ function CertificationPage() {
   const queryClient = useQueryClient();
   const [isApplying, setIsApplying] = useState(false);
   const [step, setStep] = useState(1);
+  const [selectedCert, setSelectedCert] = useState<any>(null);
 
   // General details
   const [farmName, setFarmName] = useState(user?.farm_name || "");
@@ -1127,6 +1129,7 @@ function CertificationPage() {
                               <th className="py-3 px-6 text-center">Score</th>
                               <th className="py-3 px-6">Validator</th>
                               <th className="py-3 px-6">Proof</th>
+                              <th className="py-3 px-6 text-right">Certificate</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1149,6 +1152,15 @@ function CertificationPage() {
                                 </td>
                                 <td className="py-4 px-6 text-xs text-muted-foreground">
                                   {c.validator_photo ? "Available" : "-"}
+                                </td>
+                                <td className="py-4 px-6 text-right">
+                                  <Button
+                                    onClick={() => setSelectedCert(c)}
+                                    size="sm"
+                                    className="rounded-xl bg-forest hover:bg-forest-deep text-cream font-bold transition shadow-sm text-xs py-1 px-3"
+                                  >
+                                    View Certificate
+                                  </Button>
                                 </td>
                               </tr>
                             ))}
@@ -1422,6 +1434,11 @@ function CertificationPage() {
           )}
         </div>
       )}
+      <CertificateModal
+        isOpen={selectedCert !== null}
+        onClose={() => setSelectedCert(null)}
+        certification={selectedCert}
+      />
     </div>
   );
 }
