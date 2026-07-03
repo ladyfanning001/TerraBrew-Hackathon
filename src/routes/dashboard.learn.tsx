@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BookOpen, Droplets, Sun, Award, CloudRain, Coffee } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -161,6 +161,26 @@ const articleContent: Record<string, React.ReactNode> = {
 
 function LearnPage() {
   const [selectedLesson, setSelectedLesson] = useState<typeof lessons[0] | null>(null);
+
+  useEffect(() => {
+    const handleArticleSelect = () => {
+      const articleTitle = localStorage.getItem("open_article_search");
+      if (articleTitle) {
+        const match = lessons.find(l => l.title.toLowerCase().includes(articleTitle.toLowerCase()));
+        if (match) {
+          setSelectedLesson(match);
+        }
+        localStorage.removeItem("open_article_search");
+      }
+    };
+
+    window.addEventListener("learn-article-select", handleArticleSelect);
+    handleArticleSelect();
+
+    return () => {
+      window.removeEventListener("learn-article-select", handleArticleSelect);
+    };
+  }, []);
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">

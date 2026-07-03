@@ -272,9 +272,14 @@ function DashboardHome() {
 
   // Environmental inputs states
   const [rainfall, setRainfall] = useState([35]);
-  const [water, setWater] = useState([55]);
   const [temperature, setTemperature] = useState([24]);
   const [humidity, setHumidity] = useState([78]);
+  const [cloudCover, setCloudCover] = useState([40]);
+  const [windSpeed, setWindSpeed] = useState([12]);
+
+  // Farmer constraint states
+  const [fermentationDuration, setFermentationDuration] = useState([24]);
+  const [hasDepulper, setHasDepulper] = useState(true);
 
   // Coffee Grade input state (restored)
   const [grade, setGrade] = useState("A");
@@ -345,6 +350,29 @@ function DashboardHome() {
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
+  // Handle preset selected from universal search in header
+  useEffect(() => {
+    const handlePresetSelect = () => {
+      const stored = localStorage.getItem("weather_preset_select");
+      if (stored) {
+        try {
+          const preset = JSON.parse(stored);
+          setLocationInput(preset.name);
+          fetchWeatherForCoords(preset.name, preset.lat, preset.lng, preset.elevation);
+          localStorage.removeItem("weather_preset_select");
+        } catch (e) {
+          console.error("Failed to parse search weather preset:", e);
+        }
+      }
+    };
+    window.addEventListener("weather-preset-update", handlePresetSelect);
+    handlePresetSelect();
+
+    return () => {
+      window.removeEventListener("weather-preset-update", handlePresetSelect);
+    };
+  }, []);
+
   // Fetch real-time weather from Open-Meteo API using coordinates
   const fetchWeatherForCoords = async (name: string, lat: string, lng: string, elevation: string) => {
     setIsLoading(true);
@@ -352,7 +380,7 @@ function DashboardHome() {
 
     try {
       const response = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,rain`
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,rain,cloudcover,windspeed_10m`
       );
       if (!response.ok) throw new Error("Failed to fetch weather data");
       
@@ -362,12 +390,14 @@ function DashboardHome() {
       const temp = Math.round(current.temperature_2m);
       const hum = Math.round(current.relative_humidity_2m);
       const rain = current.rain > 0 ? Math.round(current.rain * 12 + 5) : 0;
-      const waterVal = Math.min(100, Math.max(10, 100 - Math.round(hum * 0.45)));
+      const clouds = current.cloudcover ?? 0;
+      const wind = current.windspeed_10m ?? 0;
 
       setTemperature([temp]);
       setHumidity([hum]);
       setRainfall([rain]);
-      setWater([waterVal]);
+      setCloudCover([clouds]);
+      setWindSpeed([wind]);
 
       setCoordinates({ lat, lng, elevation });
       setActiveLocation(name);
@@ -382,7 +412,8 @@ function DashboardHome() {
       setTemperature([23]);
       setHumidity([60]);
       setRainfall([5]);
-      setWater([75]);
+      setCloudCover([20]);
+      setWindSpeed([10]);
       setActiveLocation(name);
       setCoordinates({ lat, lng, elevation });
     } finally {
@@ -418,49 +449,67 @@ function DashboardHome() {
   };
 
   // Agronomical recommendation scoring logic based on environmental and crop grade variables
+  // Agronomical recommendation scoring logic based on environmental and crop grade variables (PDF Tables 1, 2, 7)
   const scores = useMemo(() => {
     const r = rainfall[0];
-    const w = water[0];
     const t = temperature[0];
     const h = humidity[0];
+    const c = cloudCover[0];
+    const wS = windSpeed[0];
+    const fd = fermentationDuration[0];
+    
+    // Auto-infer water availability based on rainfall and humidity
+    const w = Math.min(100, Math.max(10, 100 - (h * 0.4) + (r * 1.5)));
 
     // 1. WASHED
-    let washed = 50;
-    washed += (w / 100) * 35; // heavily dependent on water
-    washed += (r / 150) * 15; // favored in high rainfall (mucilage washed off makes it safer to dry)
-    washed += (h / 100) * 10;
-    if (w < 30) washed -= 40; // penalize heavily if no water
+    // Air melimpah (w > 75), Musim hujan + air banyak, Curah hujan tinggi + RH tinggi
+    let washed = 30;
+    if (!hasDepulper) washed -= 100; // Impossible
+    if (w > 75) washed += 35;
+    if (w < 30) washed -= 50; // Hampir tidak mungkin jika air sangat terbatas
+    if (r > 20 && h > 65) washed += 25; // Risiko jamur lebih rendah
+    if (fd > 72) washed -= 40; // Washed shouldn't ferment this long
 
     // 2. SEMI WASHED
-    let semiWashed = 55;
-    semiWashed += w >= 40 ? 25 : 0;
-    semiWashed += r > 30 ? 15 : 5;
-    semiWashed += h > 70 ? 10 : 5;
-    if (w < 15) semiWashed -= 30;
+    // Air cukup (w > 40), Curah hujan tinggi + RH tinggi
+    let semiWashed = 35;
+    if (!hasDepulper) semiWashed -= 100; // Impossible
+    if (w > 40 && w <= 75) semiWashed += 25;
+    if (w > 75) semiWashed += 15; // Bisa dilakukan tapi airnya berlebih
+    if (w < 20) semiWashed -= 30;
+    if (r > 20 && h > 65) semiWashed += 20;
 
     // 3. HONEY
-    let honey = 60;
-    honey += (w < 70 && w > 20) ? 25 : 5; // sweet spot for water
-    honey += (h >= 50 && h <= 65) ? 20 : 0; // sweet spot for humidity
-    if (h > 70) honey -= 35; // sticky mucilage mold risk under high humidity
-    if (r > 60) honey -= 25; // rewetting risk
+    // Air terbatas (w > 15 && w < 50), RH sedang + suhu stabil (h 50-60, t 20-30), Cuaca kering (r < 10)
+    let honey = 30;
+    if (!hasDepulper) honey -= 100; // Impossible
+    if (w > 15 && w < 50) honey += 25; // Hemat air
+    if (w < 15) honey -= 10; // Butuh sedikit air untuk pulping
+    if (h >= 50 && h <= 65 && t >= 20 && t <= 30) honey += 25; // Risiko moderat
+    if (r < 15) honey += 10; // Musim kemarau mengurangi penggunaan air
+    if (h > 70) honey -= 30; // Sticky mucilage mudah jamur
 
-    // 4. WINE PROCESS
-    let wine = 50;
-    wine += w < 40 ? 25 : 5; // dry method (doesn't need water)
-    wine += (h >= 45 && h <= 60) ? 25 : -15; // likes controlled humidity
-    if (h > 70) wine -= 35;
-    // Grade constraint from journal: Wine process requires high-quality selective cherry
-    if (grade === "A") wine += 20; 
-    else if (grade === "C") wine -= 40; // heavily penalize low grade
+    // 4. WINE PROCESS / ANAEROBIC
+    // Cuaca tidak stabil, Air rendah
+    let wine = 25;
+    if (w < 40) wine += 15;
+    if (grade === "A") wine += 30; // Butuh selective premium
+    if (grade === "C") wine -= 50;
+    if (h > 70) wine += 10; // Cenderung aman dari jamur awal karena anaerob
+    if (t > 30) wine -= 25; // Suhu tinggi merusak mikroba fermentasi
+    if (fd > 72) wine += 40; // Needs extended duration
 
     // 5. NATURAL
-    let natural = 45;
-    natural += w < 30 ? 30 : 5; // ideal for low water
-    natural += r < 20 ? 25 : -25; // loves dry weather
-    natural += h < 60 ? 25 : -35; // hates humidity
-    if (h > 70) natural -= 50; // high mold risk
-    if (r > 40) natural -= 45;
+    // Air sangat terbatas (w < 25), Cuaca kering & panas stabil (h < 60, r < 15, t 25-35)
+    let natural = 30;
+    if (w < 25) natural += 40; // Hampir tidak membutuhkan air
+    if (w > 60) natural -= 10; // Sayang kalau air banyak malah natural
+    if (h < 60 && r < 15) natural += 30; // Cocok untuk fruit-on drying
+    if (h > 70 || r > 20) natural -= 50; // Sangat bahaya mold growth & black bean
+    if (c > 60) natural -= 20; // Needs sun
+    if (wS > 20) natural += 15; // Wind helps drying
+
+    const clamp = (val: number) => Math.max(0, Math.min(100, val));
 
     return {
       washed: clamp(washed),
@@ -469,7 +518,7 @@ function DashboardHome() {
       wine: clamp(wine),
       natural: clamp(natural),
     };
-  }, [rainfall, water, temperature, humidity, grade]);
+  }, [rainfall, temperature, humidity, grade, cloudCover, windSpeed, fermentationDuration, hasDepulper]);
 
   // Determine top pick key
   const topKey = useMemo(() => {
@@ -479,6 +528,25 @@ function DashboardHome() {
   }, [scores]);
 
   const recommendedData = METHOD_DETAILS[topKey];
+
+  // Output Quality Prediction (PDF Table 6 & Expanded Chemistry Targets)
+  const outputPrediction = useMemo(() => {
+    const h = humidity[0];
+    const r = rainfall[0];
+    const temp = temperature[0];
+    const fd = fermentationDuration[0];
+    const selected = topKey;
+
+    if (temp > 45) return "Thermal damage (Aroma flattening, roasted defect, low acidity)";
+    if (h > 70) return "Risiko mold & acidity defect (High BOD/COD in waste)";
+    if (fd > 96 && selected !== "wine") return "Over-fermentation risk (Vinegar defect, off-flavors)";
+    
+    if (temp >= 20 && temp <= 30 && h >= 50 && h <= 55) return "Specialty potential tinggi (Stable metabolits)";
+    if (selected === "natural" && h < 60 && r < 15) return "Fruity sweetness tinggi (Intense fruitiness)";
+    if (selected === "honey" && h >= 50 && h <= 65) return "Body & sweetness meningkat";
+    
+    return "Flavor profile standar berdasarkan process type";
+  }, [humidity, temperature, rainfall, topKey, fermentationDuration]);
 
   // Recharts Charting Data
   const radarData = useMemo(() => {
@@ -502,62 +570,84 @@ function DashboardHome() {
   }, []);
 
   // Risk alert rules engine
+  // Risk alert rules engine (Table 5: Monitoring Resiko)
   const alerts = useMemo(() => {
     const alertList = [];
     const h = humidity[0];
     const r = rainfall[0];
     const temp = temperature[0];
+    const c = cloudCover[0];
+    const fd = fermentationDuration[0];
 
     if (h > 70) {
       alertList.push({
         level: "danger",
-        title: "High Humidity Alert (>70% RH)",
-        desc: `Relative Humidity is at ${h}%. High risk of mold growth (kapang) and rewetting during solar drying. Increase ventilation airflow immediately.`,
+        title: "Mold growth risk",
+        desc: `RH >70% detected (${h}%). High risk of fungal growth. Solution: Tingkatkan ventilasi.`,
       });
-    } else if (h < 50) {
+    }
+
+    if (r > 15) {
       alertList.push({
-        level: "info",
-        title: "Dry Air Conditions (<50% RH)",
-        desc: "Low relative humidity. Great for natural cherry drying, but watch for quick overdrying.",
+        level: "warning",
+        title: "Rewetting risk",
+        desc: `Rainfall detected (${r} mm/day). Risk of kapang & biji busuk. Solution: Tutup dryer.`,
       });
     }
 
     if (temp > 35) {
       alertList.push({
-        level: "warning",
-        title: "High Drying Temperature (>35°C)",
-        desc: `Drying too fast! Risk of 'case hardening' (uneven moisture) and quality degradation. Shade your patio drying beds or reduce airflow temp.`,
-      });
-    } else if (temp < 20) {
-      alertList.push({
-        level: "warning",
-        title: "Cool Temperature Alert (<20°C)",
-        desc: "Drying is slow. Extended fermentation might occur, potentially causing off-flavors and acetic notes.",
+        level: "danger",
+        title: "Overdrying / Thermal damage",
+        desc: `Temp >35°C detected (${temp}°C). High risk of aroma flattening and roasted defects. Solution: Turunkan suhu.`,
       });
     }
 
-    if (r > 30) {
+    if (c > 75) {
+      alertList.push({
+        level: "warning",
+        title: "Low Solar Radiation",
+        desc: `Cloud cover at ${c}%. Solar drying will be extremely slow. Consider mechanical drying if humidity is also high.`,
+      });
+    }
+
+    if (fd > 72 && topKey !== "wine") {
       alertList.push({
         level: "danger",
-        title: "Heavy Rainfall Detected",
-        desc: `${r} mm rainfall. Cover solar dryer beds immediately. Wet cherries will rot and develop sour/musty defects.`,
+        title: "Over-fermentation Risk",
+        desc: `Duration ${fd}h is too long for standard processing. Stop fermentasi immediately or risk vinegar defects.`,
+      });
+    }
+
+    // Default if all good
+    if (alertList.length === 0) {
+      alertList.push({
+        level: "info",
+        title: "Conditions Optimal",
+        desc: "Environmental parameters and constraints are stable. Continue monitoring.",
       });
     }
 
     return alertList;
-  }, [humidity, rainfall, temperature]);
+  }, [humidity, rainfall, temperature, cloudCover, fermentationDuration, topKey]);
 
-  // Drying Decision Actions
+  // Drying Decision Actions (Table 3: Drying System)
   const dryingAction = useMemo(() => {
     const h = humidity[0];
     const temp = temperature[0];
     const r = rainfall[0];
+    const wS = windSpeed[0];
 
-    if (r > 15) return { status: "Rain Detected", action: "Close solar dryer / Move beans to shade" };
-    if (h > 70) return { status: "High Mold Risk", action: "Activate ventilation / Increase mechanical dryer airflow" };
-    if (temp > 35) return { status: "Overheating Risk", action: "Lower airflow temperature / Shade the drying beds" };
-    return { status: "Optimal", action: "Continue periodic parameter monitoring" };
-  }, [humidity, temperature, rainfall]);
+    if (r > 15) return { status: "Rewetting risk", action: "Tutup solar dryer" };
+    if (h > 70) {
+       if (wS > 15) return { status: "Risiko tinggi (Mitigated by Wind)", action: "Lanjutkan ventilasi alami, monitor RH" };
+       return { status: "Risiko tinggi", action: "Tutup dryer / aktifkan ventilasi mekanis" };
+    }
+    if (temp > 35) return { status: "Overheating risk", action: "Turunkan airflow panas" };
+    if (temp >= 20 && temp <= 35 && h >= 50 && h <= 55) return { status: "Optimal", action: "Lanjut drying" };
+    
+    return { status: "Monitoring Needed", action: "Continue parameter monitoring" };
+  }, [humidity, temperature, rainfall, windSpeed]);
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 text-foreground bg-background">
@@ -678,7 +768,6 @@ function DashboardHome() {
                         setIsLocationConfirmed(false);
                         // Reset weather variables to defaults
                         setRainfall([35]);
-                        setWater([55]);
                         setTemperature([24]);
                         setHumidity([78]);
                         setActiveLocation(null);
@@ -708,13 +797,22 @@ function DashboardHome() {
                 description="Rainfall limits sun-drying efficiency and prompts wet processes."
               />
               <FormSliderRow
-                icon={Droplets}
-                label="Water Availability"
-                value={water}
-                onChange={setWater}
+                icon={CloudSun}
+                label="Cloud Cover"
+                value={cloudCover}
+                onChange={setCloudCover}
                 max={100}
                 unit="%"
-                description="Critical water supplies determine fully washed eligibility."
+                description="High cloud cover slows down solar drying drastically."
+              />
+              <FormSliderRow
+                icon={Wind}
+                label="Wind Speed"
+                value={windSpeed}
+                onChange={setWindSpeed}
+                max={50}
+                unit="km/h"
+                description="High wind speed aids natural ventilation for raised beds."
               />
             </div>
             <div className="space-y-6">
@@ -729,7 +827,7 @@ function DashboardHome() {
                 description="Drying temperatures outside 20–35°C risk defects or rot."
               />
               <FormSliderRow
-                icon={Wind}
+                icon={Droplets}
                 label="Relative Humidity (RH)"
                 value={humidity}
                 onChange={setHumidity}
@@ -740,26 +838,74 @@ function DashboardHome() {
             </div>
           </div>
 
-          {/* STEP 3: Coffee Quality (Cherry Grade) */}
-          <div className="pt-6 border-t border-border/60">
-            <div className="max-w-md space-y-2 bg-secondary/15 p-4 rounded-xl border border-border/40">
-              <Label htmlFor="coffee-grade" className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
-                <Coffee className="h-4 w-4 text-coffee" />
-                Coffee Cherry Quality Grade
-              </Label>
-              <Select value={grade} onValueChange={setGrade}>
-                <SelectTrigger id="coffee-grade" className="rounded-xl bg-background border-border text-xs focus:ring-accent">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="A">Grade A — Specialty Cherry (Perfect ripeness, zero defects)</SelectItem>
-                  <SelectItem value="B">Grade B — Premium Grade Cherry (Minor defects permitted)</SelectItem>
-                  <SelectItem value="C">Grade C — Commercial Grade Cherry (Spontaneous/mixed harvest)</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-[10px] text-muted-foreground leading-relaxed">
-                *Certain fermentation processes (e.g. Wine process) require Grade A cherries to lock in optimal boozy notes without risk of mold.
-              </p>
+          {/* STEP 3: Farmer Constraints & Targets */}
+          <div className="grid gap-6 md:grid-cols-2 pt-6 border-t border-border/60">
+            {/* Left Card: Fermentation Process */}
+            <div className="bg-card p-6 rounded-2xl border border-border shadow-sm flex flex-col space-y-6">
+              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                <FlaskConical className="h-4 w-4 text-primary" />
+                Fermentation Process
+              </h3>
+              <div className="flex-1">
+                <FormSliderRow
+                  icon={FlaskConical}
+                  label="Target Fermentation Duration"
+                  value={fermentationDuration}
+                  onChange={setFermentationDuration}
+                  min={12}
+                  max={120}
+                  unit="hours"
+                  description="Extended durations (>72h) favor Anaerobic/Wine processes."
+                />
+              </div>
+            </div>
+
+            {/* Right Card: Hardware & Quality */}
+            <div className="bg-card p-6 rounded-2xl border border-border shadow-sm flex flex-col space-y-6">
+              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                <Database className="h-4 w-4 text-accent" />
+                Farm Capabilities
+              </h3>
+              <div className="space-y-4 flex-1">
+                <div className="bg-secondary/15 p-4 rounded-xl border border-border/40">
+                  <Label className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider mb-3">
+                    <Database className="h-4 w-4 text-accent" />
+                    Available Equipment
+                  </Label>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-foreground">Depulper Machine</span>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setHasDepulper(!hasDepulper)}
+                      className={hasDepulper ? "bg-accent/15 text-accent border-accent hover:bg-accent/20" : "bg-card text-muted-foreground"}
+                    >
+                      {hasDepulper ? <CheckCircle2 className="h-4 w-4 mr-1.5"/> : <X className="h-4 w-4 mr-1.5"/>}
+                      {hasDepulper ? "Available" : "Unavailable"}
+                    </Button>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed">
+                    *Without a depulper, Washed and Honey processes are physically impossible.
+                  </p>
+                </div>
+
+                <div className="bg-secondary/15 p-4 rounded-xl border border-border/40 space-y-3">
+                  <Label className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
+                    <Coffee className="h-4 w-4 text-coffee" />
+                    Coffee Cherry Quality Grade
+                  </Label>
+                  <Select value={grade} onValueChange={setGrade}>
+                    <SelectTrigger className="rounded-xl bg-background border-border text-xs focus:ring-accent">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="A">Grade A — Specialty Cherry (Perfect ripeness)</SelectItem>
+                      <SelectItem value="B">Grade B — Premium Grade Cherry</SelectItem>
+                      <SelectItem value="C">Grade C — Commercial Grade Cherry</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -776,7 +922,6 @@ function DashboardHome() {
                     data: {
                       location: activeLocation || "Manual Input",
                       rainfall: rainfall[0],
-                      water: water[0],
                       temperature: temperature[0],
                       humidity: humidity[0],
                       grade: grade,
@@ -827,6 +972,15 @@ function DashboardHome() {
             </div>
 
             <CardContent className="p-6 space-y-6">
+              {/* Output Quality Prediction Banner */}
+              <div className="flex items-start gap-3 p-4 rounded-xl border border-accent/20 bg-accent/5">
+                <Sparkles className="h-5 w-5 text-accent mt-0.5 shrink-0" />
+                <div>
+                  <h4 className="text-sm font-bold text-foreground">Output Quality Prediction</h4>
+                  <p className="text-sm text-muted-foreground mt-1">{outputPrediction}</p>
+                </div>
+              </div>
+
               {/* 5 Methods Score Bar Comparison */}
               <div className="grid gap-4 sm:grid-cols-5">
                 {Object.keys(METHOD_DETAILS).map((k) => {

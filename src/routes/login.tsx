@@ -27,7 +27,11 @@ function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      navigate({ to: "/dashboard" });
+      if (user.role === "sea") {
+        navigate({ to: "/dashboard/validate" });
+      } else {
+        navigate({ to: "/dashboard" });
+      }
     }
   }, [user, navigate]);
 

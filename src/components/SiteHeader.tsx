@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { 
   Bell, CloudSun, Search, LogOut, User, MapPin, Calendar, 
   CheckCircle2, XCircle, AlertCircle, Inbox
@@ -27,6 +28,9 @@ export function SiteHeader() {
   const { user, logout } = useAuth();
   const [weather, setWeather] = useState({ name: "Bandung", temp: 24, humidity: 78 });
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  const navigate = useNavigate();
+  // Weather sync logic
 
   useEffect(() => {
     const handleWeatherUpdate = () => {
@@ -135,13 +139,6 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur-md md:px-6">
       <SidebarTrigger className="text-foreground" />
-      <div className="hidden md:flex relative w-72">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="Search recommendations, regions..."
-          className="pl-9 bg-secondary/60 border-transparent focus-visible:bg-background"
-        />
-      </div>
 
       <div className="ml-auto flex items-center gap-2 md:gap-3">
         <div className="hidden lg:flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-3 py-1.5 text-xs">
