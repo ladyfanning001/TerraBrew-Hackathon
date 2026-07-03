@@ -1177,6 +1177,50 @@ function DashboardHome() {
                 </div>
               </div>
 
+              {/* Sustainability Milestone / Water Savings Banner */}
+              {(() => {
+                const washedWater = 25;
+                const currentWater = recommendedData.waterLiters;
+                const waterSavedPerKg = washedWater - currentWater;
+                const totalWaterSaved = batchWeight * waterSavedPerKg;
+
+                if (waterSavedPerKg > 0) {
+                  return (
+                    <div className="flex items-start gap-4 p-5 rounded-2xl border border-forest/20 bg-forest/5 shadow-soft transition-all duration-300 hover:shadow-card animate-fade-in-up animation-delay-100">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-forest/10 text-forest shrink-0">
+                        <Leaf className="h-5 w-5" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="text-sm font-bold text-forest flex items-center gap-1.5">
+                          Eco-Friendly Process Option
+                          <span className="inline-block animate-bounce">💧</span>
+                        </h4>
+                        <p className="text-sm text-foreground/90 leading-relaxed">
+                          By selecting <span className="font-extrabold text-forest">{recommendedData.name}</span> instead of the conventional Washed method, you are saving approximately <span className="font-extrabold text-forest">{totalWaterSaved.toLocaleString()} Liters</span> of clean freshwater for this batch size of <span className="font-bold">{batchWeight.toLocaleString()} kg</span>! This is a significant contribution to protecting local aquifers and avoiding acidic wastewater runoffs.
+                        </p>
+                      </div>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div className="flex items-start gap-4 p-5 rounded-2xl border border-honey/20 bg-honey/5 shadow-soft transition-all duration-300 hover:shadow-card animate-fade-in-up animation-delay-100">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-honey/10 text-honey shrink-0">
+                        <Droplets className="h-5 w-5 animate-pulse" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="text-sm font-bold text-coffee">
+                          Water Conservation Notice
+                        </h4>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          This batch requires the conventional <span className="font-bold text-coffee">{recommendedData.name}</span> process to secure cup quality under current weather/risk factors, which will consume about <span className="font-bold text-coffee">{(batchWeight * recommendedData.waterLiters).toLocaleString()} Liters</span> of water. 
+                          <span className="block mt-1 font-semibold text-xs text-forest">Tip: For future batches under dry and low-humidity weather conditions, you can pivot to Honey or Natural preprocessing to save up to {(batchWeight * 24.5).toLocaleString()} L of water!</span>
+                        </p>
+                      </div>
+                    </div>
+                  );
+                }
+              })()}
+
               {/* 5 Methods Score Bar Comparison */}
               <div className="grid gap-4 sm:grid-cols-5">
                 {Object.keys(METHOD_DETAILS).map((k) => {
